@@ -23,7 +23,7 @@ def init(ob) :      #게임 초기화 함수
     random.shuffle(ob.unopenDeck)   # 카드 랜덤하게 섞기
     '''
     
-    ob.unopenDeck = []   #unopenDeck: 모든 카드 집합
+    ob.unopenDeck = []   #unopenDeck: 오픈 안한 모든 카드 집합
     colours = ["Red", "Yellow", "Blue", "Green"]
     values = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, "Skip", "Reverse", "Draw_Two", "All_In"]
     #values = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', "Skip", "Reverse", "Draw_Two", "All_In"]
