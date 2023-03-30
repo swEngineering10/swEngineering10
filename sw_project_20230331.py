@@ -11,7 +11,6 @@ init(ess)      #게임 초기 설정(카드 만들기, 섞기, 분배)
 
 
 #디버그용
-#플레이어가 4명으로 가정되어 있는 버전임
 '''for i in range(0, 5):
     print("plyer[", i, "]: ", ess.playerList[i])
 
