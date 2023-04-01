@@ -1,40 +1,55 @@
 import pygame
 import pygame_gui
+# from screen import LobbyScreen
 
 pygame.init()
 
 # 화면 크기
 screen_width = 800
 screen_height = 600
+WINDOW_SIZE = (screen_width, screen_height)
 
 # 화면 생성
 screen = pygame.display.set_mode((screen_width, screen_height))
 background = pygame.Surface((screen_width, screen_height))
 
-# 버튼 크기 및 위치
-button_count = 5
-button_width = 120
-button_height = 120
-button_spacing = 10 # 버튼의 간격
-button_x_pos = screen_width // 2 - ((button_width * (button_count)) + (button_spacing * (button_count - 1))) // 2
-button_y_pos = screen_height * 0.6
+# UI manager 생성
+manager = pygame_gui.UIManager((screen_width, screen_height))
 
-# 설명 텍스트 내용 및 크기, 위치
-text_content = "Computer Player"
-font = pygame.font.Font(None, 36)
-text = font.render(text_content, True, (255, 255, 255))
-text_width, text_height = font.size(text_content)
-text_x = screen_width // 2 - text_width // 2
-text_y = screen_height // 2 - text_height // 2
+# LobbyScreen 객체 생성
+# lobby_screen = LobbyScreen(pygame.Rect((0, 0), WINDOW_SIZE), manager)
 
-# 버튼 생성
-button_rects = []
-for i in range(button_count):
-    # x 좌표가 button_width + button_spacing 만큼 늘어나도록 정사각형 5개 생성
-    button_rect = pygame.Rect(button_x_pos + i * (button_width + button_spacing), button_y_pos, button_width, button_height)
-    button_rects.append(button_rect)    # button_rects 리스트에 넣기
+# User Name 텍스트 내용 및 크기, 위치
+text_username_content = "User Name"
+font_username = pygame.font.Font(None, 50)
+text_username = font_username.render(text_username_content, True, (255, 255, 255))
+text_username_width, text_username_height = font_username.size(text_username_content)
+text_username_x_pos = screen_width // 2 - text_username_width // 2
+text_username_y_pos = screen_height * 0.1
 
-# 버튼 상태
+# Computer Player 설명 텍스트 내용 및 크기, 위치
+text_complayer_content = "Computer Player"
+font_complayer = pygame.font.Font(None, 36)
+text_complayer = font_complayer.render(text_complayer_content, True, (255, 255, 255))
+text_complayer_width, text_complayer_height = font_complayer.size(text_complayer_content)
+text_complayer_x_pos = screen_width // 2 - text_complayer_width // 2
+text_complayer_y_pos = screen_height * 0.4
+
+# Add Player 버튼 크기 및 위치
+add_player_button_count = 5
+add_player_button_width = 120
+add_player_button_height = 120
+add_player_button_spacing = 10 # 버튼의 간격
+add_player_button_x_pos = screen_width // 2 - ((add_player_button_width * (add_player_button_count)) + (add_player_button_spacing * (add_player_button_count - 1))) // 2
+add_player_button_y_pos = screen_height // 2
+
+# Add Player 버튼 생성
+add_player_button_rects = []
+for i in range(add_player_button_count):
+    button_rect = pygame.Rect(add_player_button_x_pos + i * (add_player_button_width + add_player_button_spacing), add_player_button_y_pos, add_player_button_width, add_player_button_height)
+    add_player_button_rects.append(button_rect)
+
+# Add Player 버튼 상태
 selected_index = 0
 active_index = 1
 button_states = ["inactive", "inactive", "inactive", "inactive", "inactive"]
@@ -42,19 +57,39 @@ button_states[selected_index] = "selected"
 button_states[active_index] = "active"
 
 # 버튼 생성 및 초기화
-manager = pygame_gui.UIManager((screen_width, screen_height))
-buttons = []
-for i in range(button_count):
+add_player_buttons = []
+for i in range(add_player_button_count):
     button = pygame_gui.elements.UIButton(
-        relative_rect=button_rects[i],
+        relative_rect=add_player_button_rects[i],
         text=str("-"),
         manager=manager
     )
-    buttons.append(button)
+    add_player_buttons.append(button)
+
+# text entry 생성
+username_entry_width = 200
+username_entry_height = 50
+username_entry_x_pos = screen_width // 2 - username_entry_width // 2
+username_entry_y_pos = screen_height * 0.2
+username_entry = pygame_gui.elements.UITextEntryLine(
+    relative_rect=pygame.Rect((username_entry_x_pos, username_entry_y_pos), (username_entry_width, username_entry_height)),
+    manager=manager
+)
+
+# Game Start 버튼 생성
+start_add_player_button_width = 270
+start_add_player_button_height = 70
+start_add_player_button_x_pos = screen_width // 2 - start_add_player_button_width // 2
+start_add_player_button_y_pos = screen_height * 0.8
+start_button = pygame_gui.elements.UIButton(
+        relative_rect=pygame.Rect((start_add_player_button_x_pos, start_add_player_button_y_pos), (start_add_player_button_width, start_add_player_button_height)),
+        text=str("Game Start"),
+        manager=manager
+    )
 
 # 버튼 상태 업데이트 함수
-def update_buttons():
-    for i, button in enumerate(buttons):
+def update_add_player_buttons():
+    for i, button in enumerate(add_player_buttons):
         if button_states[i] == "selected":
             button.select()
             button.set_text("computer " + str(i + 1))
@@ -71,17 +106,18 @@ def handle_event(event):
         pygame.quit()
         quit()
     elif event.type == pygame_gui.UI_BUTTON_PRESSED:
-        for i, button in enumerate(buttons):
+        for i, button in enumerate(add_player_buttons):
             if event.ui_element == button:
-                button_logic(i)
-        update_buttons()
+                add_player_button_logic(i)
+                
+        update_add_player_buttons()
 
 # 버튼 로직 함수
-def button_logic(button_index):
+def add_player_button_logic(button_index):
     global selected_index, active_index
     # 클릭된 버튼이 active 상태일 경우
     if button_states[button_index] == "active":
-        if button_index == len(button_rects) - 1:
+        if button_index == len(add_player_button_rects) - 1:
             button_states[active_index] = "selected"
             selected_index += 1
         else :
@@ -98,7 +134,7 @@ def button_logic(button_index):
             pass
         elif button_index != selected_index:
             pass
-        elif button_index == len(button_rects) - 1:
+        elif button_index == len(add_player_button_rects) - 1:
             button_states[selected_index] = "active"
             selected_index -= 1
         else:
@@ -120,12 +156,16 @@ while True:
         manager.process_events(event)   # UIManager 이벤트 처리
         handle_event(event)     # 버튼 클릭 이벤트 처리
 
-    update_buttons()
+    update_add_player_buttons()
 
     # UIManager 업데이트 및 화면 업데이트
     manager.update(time_delta)
     screen.blit(background, (0, 0))
-    screen.blit(text, (text_x, text_y))
+    screen.blit(text_username, (text_username_x_pos, text_username_y_pos))
+    screen.blit(text_complayer, (text_complayer_x_pos, text_complayer_y_pos))
     manager.draw_ui(screen)
 
     pygame.display.update()
+
+# pygame 종료
+pygame.quit()
