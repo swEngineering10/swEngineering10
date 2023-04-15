@@ -1,0 +1,59 @@
+<function>
+
+def pop(cards) : 덱의 가장 위 카드를 뽑아내는 함수 (근데 쓸일이 없었다..)
+
+def init(ob) : 게임 초기화 함수
+
+def create(ob): 카드 생성 함수
+
+def start_card(ob): 시작 카드에 따라 작동하는 함수
+
+def print_information(ob, cards): 카드 내기 전에 현재 턴의 정보를 출력하는 함수
+
+def print_information_Draw2(ob, cards): 이전 카드가 Draw2카드일 때, 내기 전에 정보를 출력하는 함수
+
+def add_deck(ob, cards): 카드를 한장 먹는 함수
+
+def shuffle_card(ob): unopenDeck 카드를 섞는 함수
+
+ㅡㅡㅡ
+
+def play_game(ob, cards): 인간 플레이어가 게임 진행 함수
+
+def is_repeatedcard(ob, cards): 중복 카드 검사
+
+
+def special_card(ob, cards): 인간 플레이어가 특수카드를 냈을 때 처리
+ - def Draw4(ob, cards): Draw4라는 특수카드를 냈을 때 처리
+- def Draw2(ob, cards): Draw2라는 특수카드를 냈을 때 처리
+ - def All_In(ob, cards): 같은 색상 카드 다 내도록 하는 특수카드를 냈을 때 처리
+
+def color_change(ob): 인간이 카드 색깔을 바꾸는 함수  
+
+ㅡㅡㅡ
+
+def ai_play_game(ob, cards): ai 게임 진행 함수
+
+def ai_special_card(ob, cards): ai가 특수카드를 냈을때 처리
+
+def ai_color_change(ob): ai가 카드 색깔을 바꾸는 함수
+
+
+ ㅡㅡㅡ
+
+def set_turn(ob):  순서를 정하는 함수
+
+def over_turn(ob): 다음 playerTurn턴 정할 때 숫자가 넘치지 않나 검사하는 함수
+
+def next_turn(ob): 다음 nextTurn턴 정할 때 숫자가 넘치지 않나 검사하는 함수(Draw2, Draw4일때만 씀)
+
+ㅡㅡㅡ
+
+def game_end(ob): 게임 종료를 판별하는 함수      
+
+def rank_game(ob, cards): 점수 계산을 해주는 함수
+
+def print_rank(ob): 1등을 출력해주는 함수
+
+
+

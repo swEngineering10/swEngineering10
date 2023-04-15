@@ -1,0 +1,27 @@
+<class>
+
+playerList: 모든 플레이어의 보유 카드 정보
+unopenDeck: 카드 더미
+openDeck: 오픈된 카드 더미
+currentCard: openDeck의 가장 위 카드
+available: 가지고 있는 덱에서 낼 수 있는 카드 집합
+
+numPlayers: 플레이어의 수
+playerTurn: 현재 턴은 몇번째 턴?
+myTurn: 인간 플레이어의 턴은 몇번째인지 저장
+nextTurn: 다음턴은 몇번째 플레이어인가?
+doubleWild: Wild가 중복으로 나오는 경우 방지 이전 색깔 저장 변수(버스수정용 변수!)
+
+playDirection: 게임 진행 방향
+
+Draw2Attack: Draw2 공격이 진행중인가?
+Draw2Count:  Draw2 공격이 몇번 중첩되었는가?
+
+winner: 승리자 저장 변수
+score: 점수 저장 변수
+
+
+
+<function>
+
+newColour: color_change시 뭘로 색깔을 바꿀것인가 저장 변수
