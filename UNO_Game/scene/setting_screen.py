@@ -105,6 +105,7 @@ while run:
             with open("data.json", "w") as f:
                 json.dump(keyboard_data, f)
             run = False
+
         elif event.type == pygame.USEREVENT:
             if event.user_type == pygame_gui.UI_DROP_DOWN_MENU_CHANGED:
                 # 드롭다운 메뉴에서 선택한 해상도로 화면 크기 변경

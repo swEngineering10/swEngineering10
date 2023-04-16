@@ -166,6 +166,3 @@ while True:
     manager.draw_ui(screen)
 
     pygame.display.update()
-
-# pygame 종료
-pygame.quit()
