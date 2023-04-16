@@ -1,0 +1,1 @@
+class StartScreen(scene_manager)
