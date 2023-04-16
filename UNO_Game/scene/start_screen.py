@@ -1,6 +1,7 @@
 import pygame
 import pygame_gui
 import sys
+import json
 
 
 class MainScreen:
@@ -11,15 +12,26 @@ class MainScreen:
 
 
 basic = MainScreen()
+
+# load json file
+with open('display_config.json', 'r') as f:
+    config_data = json.load(f)
+
+with open("data.json", "r") as f:
+    data = json.load(f)  # load data from json file
+    keyboard = data["keyboard"]
+
+# extract width and height from the loaded json data
+width = config_data['resolution']['width']
+height = config_data['resolution']['height']
+
+
 pygame.init()
 
-screen_width = basic.width
-screen_height = basic.height
-
-screen = pygame.display.set_mode((screen_width, screen_height))
+screen = pygame.display.set_mode((width, height))
 pygame.display.set_caption("UNO GAME")
 
-manager = pygame_gui.UIManager((screen_width, screen_height))
+manager = pygame_gui.UIManager((width, height))
 
 
 def play_mode_function():
@@ -36,11 +48,11 @@ def exit_mode_function():
 
 
 button1 = pygame_gui.elements.UIButton(relative_rect=pygame.Rect(
-    basic.width // 2 - 100, basic.height // 2, 200, 50), text='SINGLE PLAY', manager=manager)
+    width // 2 * 0.8, height // 2, width // 5, height // 15 * 1.1), text='SINGLE PLAY', manager=manager)
 button2 = pygame_gui.elements.UIButton(relative_rect=pygame.Rect(
-    basic.width // 2 - 100, basic.height // 2 * 1.3, 200, 50), text='SETTING', manager=manager)
+    width // 2 * 0.8, height // 2 * 1.3, width // 5, height // 15 * 1.1), text='SETTING', manager=manager)
 button3 = pygame_gui.elements.UIButton(relative_rect=pygame.Rect(
-    basic.width // 2 - 100, basic.height // 2 * 1.6, 200, 50), text='EXIT', manager=manager)
+    width // 2 * 0.8, height // 2 * 1.6, width // 5, height // 15 * 1.1), text='EXIT', manager=manager)
 
 # button dictionary
 button_functions = {button1: play_mode_function,
@@ -56,31 +68,58 @@ class KeyboardController:
         self.buttons[self.selected_button_index]._set_active()
 
     def handle_event(self, event):
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_UP:
-                self.selected_button_index = (
-                    self.selected_button_index - 1) % len(self.buttons)
-                self.buttons[self.selected_button_index]._set_active()
-                self.buttons[(self.selected_button_index + 1) %
-                             len(self.buttons)].unselect()
-                self.buttons[(self.selected_button_index + 1) %
-                             len(self.buttons)].enable()
-            elif event.key == pygame.K_DOWN:
-                self.selected_button_index = (
-                    self.selected_button_index + 1) % len(self.buttons)
-                self.buttons[(self.selected_button_index) %
-                             len(self.buttons)]._set_active()
-                self.buttons[(self.selected_button_index - 1) %
-                             len(self.buttons)].unselect()
-                self.buttons[(self.selected_button_index - 1) %
-                             len(self.buttons)].enable()
-            elif event.key == pygame.K_RETURN:
-                clicked_button = self.buttons[self.selected_button_index]
-                if clicked_button in button_functions.keys():
-                    button_functions[clicked_button]()
-                elif self.selected_button_index == len(self.buttons) - 1:
-                    pygame.quit()
-                    sys.exit()
+        if keyboard == "UDLR":
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_UP:
+                    self.selected_button_index = (
+                        self.selected_button_index - 1) % len(self.buttons)
+                    self.buttons[self.selected_button_index]._set_active()
+                    self.buttons[(self.selected_button_index + 1) %
+                                 len(self.buttons)].unselect()
+                    self.buttons[(self.selected_button_index + 1) %
+                                 len(self.buttons)].enable()
+                elif event.key == pygame.K_DOWN:
+                    self.selected_button_index = (
+                        self.selected_button_index + 1) % len(self.buttons)
+                    self.buttons[(self.selected_button_index) %
+                                 len(self.buttons)]._set_active()
+                    self.buttons[(self.selected_button_index - 1) %
+                                 len(self.buttons)].unselect()
+                    self.buttons[(self.selected_button_index - 1) %
+                                 len(self.buttons)].enable()
+                elif event.key == pygame.K_RETURN:
+                    clicked_button = self.buttons[self.selected_button_index]
+                    if clicked_button in button_functions.keys():
+                        button_functions[clicked_button]()
+                    elif self.selected_button_index == len(self.buttons) - 1:
+                        pygame.quit()
+                        sys.exit()
+        elif keyboard == "WSAD":
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_w:
+                    self.selected_button_index = (
+                        self.selected_button_index - 1) % len(self.buttons)
+                    self.buttons[self.selected_button_index]._set_active()
+                    self.buttons[(self.selected_button_index + 1) %
+                                 len(self.buttons)].unselect()
+                    self.buttons[(self.selected_button_index + 1) %
+                                 len(self.buttons)].enable()
+                elif event.key == pygame.K_s:
+                    self.selected_button_index = (
+                        self.selected_button_index + 1) % len(self.buttons)
+                    self.buttons[(self.selected_button_index) %
+                                 len(self.buttons)]._set_active()
+                    self.buttons[(self.selected_button_index - 1) %
+                                 len(self.buttons)].unselect()
+                    self.buttons[(self.selected_button_index - 1) %
+                                 len(self.buttons)].enable()
+                elif event.key == pygame.K_RETURN:
+                    clicked_button = self.buttons[self.selected_button_index]
+                    if clicked_button in button_functions.keys():
+                        button_functions[clicked_button]()
+                    elif self.selected_button_index == len(self.buttons) - 1:
+                        pygame.quit()
+                        sys.exit()
 
     def draw(self, surface):
         pass
@@ -99,7 +138,7 @@ font = pygame.font.SysFont(None, 100)
 text = font.render("UNO", True, (255, 255, 255))
 
 # 텍스트의 중심 좌표 계산
-text_rect = text.get_rect(center=(basic.width//2, basic.height//2 - 100))
+text_rect = text.get_rect(center=(width//2, height//2 * 0.6))
 
 # pygame_gui의 UILabel 생성
 label = pygame_gui.elements.UILabel(
