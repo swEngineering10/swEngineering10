@@ -8,9 +8,7 @@ from pygame_gui.elements.ui_button import UIButton
 
 from client.networking import Networking
 from screens.abc_screen import Screen
-from screens.main_screen import MainScreen
-from utilities.image_utility import load_image
-from utilities.text_utility import truncate
+from screens.volume_screen import VolumeScreen
 
 class SettingScreen(Screen):
     def __init__(self, surface: Surface, manager: pygame_gui.UIManager, networking: Networking):
@@ -28,7 +26,7 @@ class SettingScreen(Screen):
         self.background = pygame.Surface(WINDOW_SIZE)
         self.screen = pygame.display.set_mode((WINDOW_SIZE))
         self.screen_width, self.screen_height = WINDOW_SIZE
-        self.next_screen = None
+        self.next_screen = VolumeScreen
 
         # 딕셔너리 생성
         self.data = {"resolution": {"width": self.screen_width, "height": self.screen_height}}
@@ -71,8 +69,8 @@ class SettingScreen(Screen):
 
         # 키보드 설정 변경 드롭다운 메뉴 생성
         self.keyboard_menu = pygame_gui.elements.UIDropDownMenu(
-            options_list=["Up, Down, Left, Right", "W, S, A, D"],
-            starting_option="Up, Down, Left, Right",
+            options_list=["↑, ↓, ←, →", "W, S, A, D"],
+            starting_option="↑, ↓, ←, →",
             relative_rect=pygame.Rect(
                 (self.screen_width // 2 * 1.1, self.screen_height // 2 * 1.5), (self.screen_width // 5, self.screen_height // 15)),
             manager=manager
@@ -109,7 +107,6 @@ class SettingScreen(Screen):
                     json.dump(self.data, f)
                 self.next_screen = SettingScreen
                 self.is_running = False
-                self.resolution_menu.set_starting_option = self.resolution_str
 
             elif event.ui_element == self.color_menu:
                 # 색약모드 온오프 기능 추가
@@ -130,7 +127,14 @@ class SettingScreen(Screen):
                 self.is_running = False
 
             elif event.ui_element == self.volume_button:
+                self.next_screen = VolumeScreen
+                self.is_running = False
                 pass
+            elif event.ui_element == self.home_button:
+                # 순환 참조때문에 import 조금 늦게~ㅎ
+                from screens.start_screen import StartScreen
+                self.next_screen = StartScreen
+                self.is_running = False
 
      # run 함수
     def run(self, events: list[Event]) -> bool:

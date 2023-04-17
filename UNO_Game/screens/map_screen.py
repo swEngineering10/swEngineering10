@@ -1,116 +1,222 @@
 import pygame
+import pygame.freetype
 import pygame_gui
 import json
-from pygame_gui.elements.ui_button import UIButton
+from pygame.event import Event
+from pygame.surface import Surface
+from pygame_gui.elements import UITextEntryLine, UIButton
 
-with open('display_config.json', 'r') as f:
-    config_data = json.load(f)
+from client.networking import Networking
+from screens.abc_screen import Screen
 
-width = config_data['resolution']['width']
-height = config_data['resolution']['height']
+class MapScreen(Screen):
+    def __init__(self, surface: Surface, manager: pygame_gui.UIManager, networking: Networking):
+        super().__init__(surface, manager, networking)
 
-pygame.init()
+        # json 파일 로드
+        with open('display_config.json', 'r') as f:
+            config_data = json.load(f)
 
-screen = pygame.display.set_mode((width, height))
-pygame.display.set_caption("UNO GAME")
+        self.screen_width = config_data['resolution']['width']
+        self.screen_height = config_data['resolution']['height']
+        WINDOW_SIZE = (self.screen_width, self.screen_height)
 
-manager = pygame_gui.UIManager((width, height))
+        self.background = pygame.Surface(WINDOW_SIZE)
+        self.screen = pygame.display.set_mode((WINDOW_SIZE))
+        self.screen_width, self.screen_height = WINDOW_SIZE
+        self.next_screen = None
 
-# 이미지 로드
-image1 = pygame.image.load("example1_inactive.png")
-image2 = pygame.image.load("example1_active.png")
-image3 = pygame.image.load("example2_inactive.png")
-image4 = pygame.image.load("example2_active.png")
-image5 = pygame.image.load("example3_inactive.png")
-image6 = pygame.image.load("example3_active.png")
-image7 = pygame.image.load("example4_inactive.png")
-image8 = pygame.image.load("example4_active.png")
-image9 = pygame.image.load("example5-1.png")
-image10 = pygame.image.load("example5-2.png")
-image11 = pygame.image.load("example5-3.png")
+        self.manager = manager
 
-# 이미지 rect 설정
-image_rect = image1.get_rect()
-image_rect.center = (width // 2 * 0.3, height // 2 * 0.5)
+        # 이미지 로드
+        self.image1 = pygame.image.load("assets/images/example1_inactive.png")
+        self.image2 = pygame.image.load("assets/images/example1_active.png")
+        self.image3 = pygame.image.load("assets/images/example2_inactive.png")
+        self.image4 = pygame.image.load("assets/images/example2_active.png")
+        self.image5 = pygame.image.load("assets/images/example3_inactive.png")
+        self.image6 = pygame.image.load("assets/images/example3_active.png")
+        self.image7 = pygame.image.load("assets/images/example4_inactive.png")
+        self.image8 = pygame.image.load("assets/images/example4_active.png")
+        self.image9 = pygame.image.load("assets/images/example5-1.png")
+        self.image10 = pygame.image.load("assets/images/example5-2.png")
+        self.image11 = pygame.image.load("assets/images/example5-3.png")
 
-image_rect2 = image3.get_rect()
-image_rect2.center = (width // 2 * 0.75, height // 2 * 1.1)
+        # 이미지 rect 설정
+        self.image_rect = self.image1.get_rect()
+        self.image_rect.center = (self.screen_width // 2 * 0.3, self.screen_height // 2 * 0.5)
+        self.image_rect2 = self.image3.get_rect()
+        self.image_rect2.center = (self.screen_width // 2 * 0.75, self.screen_height // 2 * 1.1)
+        self.image_rect3 = self.image5.get_rect()
+        self.image_rect3.center = (self.screen_width // 2 * 1.15, self.screen_height // 2 * 0.8)
+        self.image_rect4 = self.image7.get_rect()
+        self.image_rect4.center = (self.screen_width // 2 * 1.6, self.screen_height // 2 * 1.3)
+        self.image_rect5 = self.image9.get_rect()
+        self.image_rect5.center = (self.screen_width // 2 * 0.6, self.screen_height // 2 * 0.5)
+        self.image_rect6 = self.image10.get_rect()
+        self.image_rect6.center = (self.screen_width // 2 * 1.05, self.screen_height // 2 * 1.3)
+        self.image_rect7 = self.image11.get_rect()
+        self.image_rect7.center = (self.screen_width // 2 * 1.5, self.screen_height // 2 * 0.8)
 
-image_rect3 = image5.get_rect()
-image_rect3.center = (width // 2 * 1.15, height // 2 * 0.8)
+        # 현재 이미지 설정
+        self.current_image = self.image1
+        self.current_image2 = self.image3
+        self.current_image3 = self.image5
+        self.current_image4 = self.image7
+        self.current_image5 = self.image9
+        self.current_image6 = self.image10
+        self.current_image7 = self.image11
 
-image_rect4 = image7.get_rect()
-image_rect4.center = (width // 2 * 1.6, height // 2 * 1.3)
+        # 버튼 생성
+        self.button_rect = pygame.Rect(
+        (self.screen_width // 2 * 0.8, self.screen_height // 2 * 1.7), (self.screen_width // 5, self.screen_height // 15))
+        self.home_button = UIButton(
+        relative_rect=self.button_rect, text='HOME', manager=manager)
 
-image_rect5 = image9.get_rect()
-image_rect5.center = (width // 2 * 0.6, height // 2 * 0.5)
-
-image_rect6 = image10.get_rect()
-image_rect6.center = (width // 2 * 1.05, height // 2 * 1.3)
-
-image_rect7 = image11.get_rect()
-image_rect7.center = (width // 2 * 1.5, height // 2 * 0.8)
-
-# 현재 이미지 설정
-current_image = image1
-current_image2 = image3
-current_image3 = image5
-current_image4 = image7
-current_image5 = image9
-current_image6 = image10
-current_image7 = image11
-
-button_rect = pygame.Rect(
-    (width // 2 * 0.4, height // 2 * 1.7), (width // 5, height // 15))
-game_button = UIButton(
-    relative_rect=button_rect, text='GAME START', manager=manager)
-
-button_rect = pygame.Rect(
-    (width // 2 * 1.2, height // 2 * 1.7), (width // 5, height // 15))
-home_button = UIButton(
-    relative_rect=button_rect, text='HOME', manager=manager)
+    # 팝업창 함수
+    def create_popup(self, manager):
+        popup_window = pygame_gui.windows.UIConfirmationDialog(
+            rect=pygame.Rect(
+                (self.screen_width//2 * 0.5, self.screen_height//2 * 0.6), (450, 250)),
+            manager=manager,
+            window_title='PlAY GAME',
+            action_long_desc='Are you sure to play Stage 1?',
+            action_short_name='OK',
+            blocking=True)
+        return popup_window
 
 
-while True:
-    time_delta = pygame.time.Clock().tick(60) / 1000.0
+    def create_popup2(self, manager):
+        popup_window = pygame_gui.windows.UIConfirmationDialog(
+            rect=pygame.Rect(
+                (self.screen_width//2 * 0.5, self.screen_height//2 * 0.6), (450, 250)),
+            manager=manager,
+            window_title='PlAY GAME',
+            action_long_desc='Are you sure to play Stage 2?',
+            action_short_name='OK',
+            blocking=True)
+        return popup_window
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            quit()
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            if image_rect.collidepoint(event.pos):
-                if current_image == image1:
-                    current_image = image2
-                else:
-                    current_image = image1
-            elif image_rect2.collidepoint(event.pos):
-                if current_image2 == image3:
-                    current_image2 = image4
-                else:
-                    current_image2 = image3
-            elif image_rect3.collidepoint(event.pos):
-                if current_image3 == image5:
-                    current_image3 = image6
-                else:
-                    current_image3 = image5
-            elif image_rect4.collidepoint(event.pos):
-                if current_image4 == image7:
-                    current_image4 = image8
-                else:
-                    current_image4 = image7
 
-    screen.fill((255, 255, 255))
+    def create_popup3(self, manager):
+        popup_window = pygame_gui.windows.UIConfirmationDialog(
+            rect=pygame.Rect(
+                (self.screen_width//2 * 0.5, self.screen_height//2 * 0.6), (450, 250)),
+            manager=manager,
+            window_title='PlAY GAME',
+            action_long_desc='Are you sure to play Stage 3?',
+            action_short_name='OK',
+            blocking=True)
+        return popup_window
 
-    screen.blit(current_image, image_rect)
-    screen.blit(current_image2, image_rect2)
-    screen.blit(current_image3, image_rect3)
-    screen.blit(current_image4, image_rect4)
-    screen.blit(current_image5, image_rect5)
-    screen.blit(current_image6, image_rect6)
-    screen.blit(current_image7, image_rect7)
 
-    manager.update(time_delta)
-    manager.draw_ui(screen)
+    def create_popup4(self, manager):
+        popup_window = pygame_gui.windows.UIConfirmationDialog(
+            rect=pygame.Rect(
+                (self.screen_width//2 * 0.5, self.screen_height//2 * 0.6), (450, 250)),
+            manager=manager,
+            window_title='PlAY GAME',
+            action_long_desc='Are you sure to play Stage 4?',
+            action_short_name='OK',
+            blocking=True)
+        return popup_window
 
-    pygame.display.update()
+
+    def handle_event(self, event):
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if self.image_rect.collidepoint(event.pos):
+                    if self.current_image == self.image1:
+                        self.current_image = self.image2
+                        self.current_image2 = self.image3
+                        self.current_image3 = self.image5
+                        self.current_image4 = self.image7
+                    else:
+                        self.current_image = self.image1
+                        self.current_image2 = self.image3
+                        self.current_image3 = self.image5
+                        self.current_image4 = self.image7
+                elif self.image_rect2.collidepoint(event.pos):
+                    if self.current_image2 == self.image3:
+                        self.current_image2 = self.image4
+                        self.current_image = self.image1
+                        self.current_image3 = self.image5
+                        self.current_image4 = self.image7
+                    else:
+                        self.current_image2 = self.image3
+                        self.current_image = self.image1
+                        self.urrent_image3 = self.image5
+                        self.current_image4 = self.image7
+                elif self.image_rect3.collidepoint(event.pos):
+                    if self.current_image3 == self.image5:
+                        self.current_image3 = self.image6
+                        self.current_image2 = self.image3
+                        self.current_image = self.image1
+                        self.current_image4 = self.image7
+                    else:
+                        self.current_image3 = self.image5
+                        self.current_image2 = self.image3
+                        self.current_image = self.image1
+                        self.current_image4 = self.image7
+                elif self.image_rect4.collidepoint(event.pos):
+                    if self.current_image4 == self.image7:
+                        self.current_image4 = self.image8
+                        self.current_image2 = self.image3
+                        self.current_image3 = self.image5
+                        self.current_image = self.image1
+                    else:
+                        self.current_image4 = self.image7
+                        self.current_image2 = self.image3
+                        self.current_image3 = self.image5
+                        self.current_image = self.image1
+
+
+            if self.current_image == self.image2:
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_RETURN:
+                        self.popup_window = self.create_popup(self.manager)
+
+            if self.current_image2 == self.image4:
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_RETURN:
+                        self.popup_window = self.create_popup2(self.manager)
+
+            if self.current_image3 == self.image6:
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_RETURN:
+                        self.popup_window = self.create_popup3(self.manager)
+
+            if self.current_image4 == self.image8:
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_RETURN:
+                        self.popup_window = self.create_popup4(self.manager)
+
+            if event.type == pygame.USEREVENT:
+                if self.popup_window and event.type == pygame_gui.UI_CONFIRMATION_DIALOG_CONFIRMED:
+                    if event.ui_object == self.popup_window:
+                        self.popup_window.kill()
+                        self.popup_window = None
+
+            if event.type == pygame_gui.UI_BUTTON_PRESSED:
+                if event.ui_element == self.home_button:
+                    from screens.start_screen import StartScreen
+                    self.next_screen = StartScreen
+                    self.is_running = False
+
+     # run 함수
+    def run(self, events: list[Event]) -> bool:
+        
+        self.screen.blit(self.background, (0, 0))
+        self.screen.fill((255, 255, 255))
+        self.screen.blit(self.current_image, self.image_rect)
+        self.screen.blit(self.current_image2, self.image_rect2)
+        self.screen.blit(self.current_image3, self.image_rect3)
+        self.screen.blit(self.current_image4, self.image_rect4)
+        self.screen.blit(self.current_image5, self.image_rect5)
+        self.screen.blit(self.current_image6, self.image_rect6)
+        self.screen.blit(self.current_image7, self.image_rect7)
+
+        for event in events:
+            self.handle_event(event)
+
+        if self.networking.current_game.is_started:
+            self.is_running = False
+        return self.is_running
