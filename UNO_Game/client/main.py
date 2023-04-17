@@ -11,7 +11,7 @@ from pygame.event import Event
 
 from networking import Networking
 from screens.abc_screen import Screen
-from screens.main_screen import MainScreen
+# from screens.main_screen import MainScreen
 from screens.start_screen import StartScreen
 from screens.lobby_screen import LobbyScreen
 from screens.setting_screen import SettingScreen
@@ -38,6 +38,11 @@ WINDOW_SIZE = (screen_width, screen_height)
 # 화면 생성
 screen = pygame.display.set_mode(WINDOW_SIZE)
 background = pygame.Surface(WINDOW_SIZE)
+
+# 배경음악 생성
+pygame.mixer.init()
+pygame.mixer.music.load("assets/musics/TakeOnMe.mp3")
+pygame.mixer.music.play()
 
 # UI manager 생성
 manager = pygame_gui.UIManager(WINDOW_SIZE)
@@ -96,6 +101,7 @@ def main(start_auth: tuple[str, str] | None = None):
 
         manager.draw_ui(screen)
         pygame.display.flip()
+
     terminate()
 
 
