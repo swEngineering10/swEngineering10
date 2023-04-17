@@ -7,9 +7,6 @@ from pygame.event import Event
 
 from client.networking import Networking
 from screens.abc_screen import Screen
-from screens.main_screen import MainScreen
-from utilities.image_utility import load_image
-from utilities.text_utility import truncate
 
 class LobbyScreen(Screen):
     def __init__(self, surface: Surface, manager: pygame_gui.UIManager, networking: Networking):
@@ -26,7 +23,7 @@ class LobbyScreen(Screen):
         self.background = pygame.Surface(WINDOW_SIZE)
         self.screen = pygame.display.set_mode((WINDOW_SIZE))
         self.screen_width, self.screen_height = WINDOW_SIZE
-        self.next_screen = MainScreen
+        # self.next_screen = MainScreen
 
         # User Name 텍스트 내용 및 크기, 위치
         self.text_username_content = "User Name"
