@@ -10,8 +10,7 @@ from client.networking import Networking
 from screens.abc_screen import Screen
 from screens.lobby_screen import LobbyScreen
 from screens.setting_screen import SettingScreen
-from utilities.image_utility import load_image
-from utilities.text_utility import text_on_center, center_rect
+from screens.mode_screen import ModeScreen
 
 
 class StartScreen(Screen):
@@ -29,7 +28,7 @@ class StartScreen(Screen):
         self.background = pygame.Surface(WINDOW_SIZE)
         self.screen = pygame.display.set_mode((WINDOW_SIZE))
         self.screen_width, self.screen_height = WINDOW_SIZE
-        self.next_screen = LobbyScreen
+        self.next_screen = ModeScreen
         
         # UNO 텍스트 생성
         self.font = pygame.font.SysFont(None, 100)
@@ -51,7 +50,7 @@ class StartScreen(Screen):
         self.buttons[self.selected_button_index]._set_active()
     
     def play_mode_function(self):
-        self.next_screen = LobbyScreen
+        self.next_screen = ModeScreen
         self.is_running = False
         
 

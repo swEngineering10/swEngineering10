@@ -1,99 +1,102 @@
 import pygame
+import pygame.freetype
 import pygame_gui
 import json
+from pygame.surface import Surface
+from pygame.event import Event
 from pygame_gui.elements.ui_button import UIButton
 
+from client.networking import Networking
+from screens.abc_screen import Screen
 
-pygame.init()
+class VolumeScreen(Screen):
+    def __init__(self, surface: Surface, manager: pygame_gui.UIManager, networking: Networking):
+        super().__init__(surface, manager, networking)
 
-# load json file
-with open('display_config.json', 'r') as f:
-    config_data = json.load(f)
+        # json 파일 로드
+        with open('display_config.json', 'r') as f:
+            config_data = json.load(f)
 
-# extract width and height from the loaded json data
-width = config_data['resolution']['width']
-height = config_data['resolution']['height']
+        # json 파일로부터 받은 해상도 값 반영
+        self.screen_width = config_data['resolution']['width']
+        self.screen_height = config_data['resolution']['height']
+        WINDOW_SIZE = (self.screen_width, self.screen_height)
 
-screen = pygame.display.set_mode((width, height))
-pygame.display.set_caption("UNO GAME")
+        self.background = pygame.Surface(WINDOW_SIZE)
+        self.screen = pygame.display.set_mode((WINDOW_SIZE))
+        self.screen_width, self.screen_height = WINDOW_SIZE
 
-manager = pygame_gui.UIManager((width, height))
+        self.font = pygame.font.SysFont(None, 100)
+        self.uni_font = pygame.font.SysFont(None, 30)
 
-font = pygame.font.SysFont(None, 100)
-uni_font = pygame.font.SysFont(None, 30)
+        # "Volume" 텍스트 생성
+        self.text = self.font.render("VOLUME", True, (255, 255, 255))
+        self.text1 = self.uni_font.render("Static Sound", True, (255, 255, 255))
+        self.text2 = self.uni_font.render("Background", True, (255, 255, 255))
+        self.text3 = self.uni_font.render("Sound Effect", True, (255, 255, 255))
 
-# "Volume" 텍스트 생성
-text = font.render("VOLUME", True, (255, 255, 255))
-text1 = uni_font.render("Static Sound", True, (255, 255, 255))
-text2 = uni_font.render("Background", True, (255, 255, 255))
-text3 = uni_font.render("Sound Effect", True, (255, 255, 255))
+        # 텍스트의 중심 좌표 계산
+        self.text_rect = self.text.get_rect(center=(self.screen_width//2, self.screen_height//2 * 0.5))
+        self.text1_rect = self.text1.get_rect(
+            center=(self.screen_width // 2 * 0.5, self.screen_height // 2))
+        self.text2_rect = self.text2.get_rect(
+            center=(self.screen_width // 2 * 0.5, self.screen_height // 2 * 1.3))
+        self.text3_rect = self.text3.get_rect(
+            center=(self.screen_width // 2 * 0.5, self.screen_height // 2 * 1.6))
 
-# 텍스트의 중심 좌표 계산
-text_rect = text.get_rect(center=(width//2, height//2 * 0.5))
-text1_rect = text1.get_rect(
-    center=(width // 2 * 0.5, height // 2))
-text2_rect = text2.get_rect(
-    center=(width // 2 * 0.5, height // 2 * 1.3))
-text3_rect = text3.get_rect(
-    center=(width // 2 * 0.5, height // 2 * 1.6))
+        self.slider1 = pygame_gui.elements.UIHorizontalSlider(
+            relative_rect=pygame.Rect(
+                (self.screen_width // 2, self.screen_height // 2 * 0.9), (self.screen_width // 4, self.screen_height // 12)),
+            start_value=50.0,
+            value_range=(0.0, 100.0, 1.0),
+            manager=manager
+        )
 
-slider1 = pygame_gui.elements.UIHorizontalSlider(
-    relative_rect=pygame.Rect(
-        (width // 2, height // 2 * 0.9), (width // 4, height // 12)),
-    start_value=50.0,
-    value_range=(0.0, 100.0, 1.0),
-    manager=manager
-)
+        self.volume_data = {"volume1": self.slider1.get_current_value()}
 
-volume_data = {"volume1": slider1.get_current_value()}
+        self.slider2 = pygame_gui.elements.UIHorizontalSlider(
+            relative_rect=pygame.Rect(
+                (self.screen_width // 2, self.screen_height // 2 * 1.2), (self.screen_width // 4, self.screen_height // 12)),
+            start_value=50.0,
+            value_range=(0.0, 100.0, 1.0),
+            manager=manager
+        )
 
-slider2 = pygame_gui.elements.UIHorizontalSlider(
-    relative_rect=pygame.Rect(
-        (width // 2, height // 2 * 1.2), (width // 4, height // 12)),
-    start_value=50.0,
-    value_range=(0.0, 100.0, 1.0),
-    manager=manager
-)
+        self.slider3 = pygame_gui.elements.UIHorizontalSlider(
+            relative_rect=pygame.Rect(
+                (self.screen_width // 2, self.screen_height // 2 * 1.5), (self.screen_width // 4, self.screen_height // 12)),
+            start_value=50.0,
+            value_range=(0.0, 100.0, 1.0),
+            manager=manager
+        )
 
-slider3 = pygame_gui.elements.UIHorizontalSlider(
-    relative_rect=pygame.Rect(
-        (width // 2, height // 2 * 1.5), (width // 4, height // 12)),
-    start_value=50.0,
-    value_range=(0.0, 100.0, 1.0),
-    manager=manager
-)
+        # 나가기버튼 생성
+        self.button_rect = pygame.Rect(
+            (self.screen_width // 2 * 0.75, self.screen_height // 2 * 1.8), (self.screen_width // 5, self.screen_height // 15))
+        self.exit_button = UIButton(
+            relative_rect=self.button_rect, text='Exit', manager=manager)
 
-# 나가기버튼 생성
-button_rect = pygame.Rect(
-    (width // 2 * 0.75, height // 2 * 1.8), (width // 5, height // 15))
-reset_button = UIButton(
-    relative_rect=button_rect, text='Exit', manager=manager)
 
-# 이벤트 루프
-clock = pygame.time.Clock()
+    def handle_event(self, event):
+        if event.type == pygame_gui.UI_BUTTON_PRESSED:
+            if event.ui_element == self.exit_button:
+                # 순환 참조때문에 import 조금 늦게~ㅎ
+                from screens.setting_screen import SettingScreen
+                self.next_screen = SettingScreen
+                self.is_running = False
 
-run = True
-while run:
-    delta_time = clock.tick(60) / 1000.0
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            with open("volume.json", "w") as f:
-                json.dump(volume_data, f)
-            run = False
-        if event.type == pygame.USEREVENT:
-            if event.user_type == pygame_gui.UI_HORIZONTAL_SLIDER_MOVED:
-                volume_data["volume1"] = slider1.get_current_value()
+         # run 함수
+    def run(self, events: list[Event]) -> bool:
+        
+        self.screen.blit(self.background, (0, 0))
+        self.screen.blit(self.text, self.text_rect)
+        self.screen.blit(self.text1, self.text1_rect)
+        self.screen.blit(self.text2, self.text2_rect)
+        self.screen.blit(self.text3, self.text3_rect)
 
-        manager.process_events(event)
+        for event in events:
+            self.handle_event(event)
 
-    manager.update(delta_time)
-    screen.fill((0, 0, 0))
-    screen.blit(text, text_rect)
-    screen.blit(text1, text1_rect)
-    screen.blit(text2, text2_rect)
-    screen.blit(text3, text3_rect)
-    manager.draw_ui(screen)
-
-    pygame.display.update()
-
-pygame.quit()
+        if self.networking.current_game.is_started:
+            self.is_running = False
+        return self.is_running
