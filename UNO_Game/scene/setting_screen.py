@@ -32,7 +32,7 @@ manager = pygame_gui.UIManager((screen_width, screen_height))
 # 화면 해상도 드롭다운 메뉴 생성
 resolution_menu = pygame_gui.elements.UIDropDownMenu(
     options_list=["640x480", "800x600", "1024x768"],
-    starting_option="800x600",
+    starting_option='800x600',
     relative_rect=pygame.Rect(
         (basic.width // 2 * 1.1, basic.height // 2 * 0.9), (width // 5, height // 15)),
     manager=manager
