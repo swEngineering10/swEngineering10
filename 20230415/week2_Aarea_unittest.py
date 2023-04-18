@@ -1,4 +1,4 @@
-# 지역B 스크립트 검증
+# 지역A 스크립트 검증
 import itertools
 
 from class_20230415 import *
