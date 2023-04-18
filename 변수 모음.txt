@@ -20,6 +20,7 @@ Draw2Count:  Draw2 공격이 몇번 중첩되었는가?
 winner: 승리자 저장 변수
 score: 점수 저장 변수
 
+smartAi: 지역A에서 쓰는 똑똑한 AI를 쓸 것인가?
 
 
 <function>
