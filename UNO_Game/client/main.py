@@ -31,6 +31,11 @@ if os.path.isfile('display_config.json'):
 else:
     screen_width = 800
     screen_height = 600
+    data = {"resolution": {"width": screen_width, "height": screen_height}}
+    data["resolution"]["width"] = screen_width
+    data["resolution"]["height"] = screen_height
+    with open('display_config.json', 'w') as f:
+        json.dump(data, f)
 
 # 윈도우 사이즈 지정
 WINDOW_SIZE = (screen_width, screen_height)
