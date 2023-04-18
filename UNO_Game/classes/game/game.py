@@ -1,21 +1,23 @@
 from dataclasses import dataclass
 
-
+from classes.auth.user import User
 from classes.decks.game_deck import GameDeck
 from classes.enums.directions import Directions
 
 
 @dataclass
 class Game:
+    users: list[User]
     deck: GameDeck
-    cur_user_index: int = 0 #랜덤으로 바꿔야함.
+    cur_user_index: int = 0
     direction: Directions = Directions.CLOCKWISE
 
-    def append_user(self):
+    def append_user(self, user: User):
         if len(self.users) <= 4:
             print(self.users)
+            self.users.append(user)
         else:
-            raise ValueError("최대 4인까지 플레이 가능합니다.")
+            raise ValueError("Слишком много пользователей")
 
     @property
     def is_started(self) -> bool:

@@ -13,8 +13,7 @@ class WildCard(Card):
         self.nominal = 50
 
     def possible_move(self, card: Card) -> bool:
-        return True
-
+        return True 
 
 @dataclass
 class WildGetFourCard(WildCard):
