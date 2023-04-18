@@ -13,8 +13,7 @@ from networking import Networking
 from screens.abc_screen import Screen
 # from screens.main_screen import MainScreen
 from screens.start_screen import StartScreen
-from screens.lobby_screen import LobbyScreen
-from screens.setting_screen import SettingScreen
+from screens.main_screen import MainScreen
 
 from utilities.image_utility import load_image
 from utilities.text_utility import truncate
@@ -68,7 +67,7 @@ def main(start_auth: tuple[str, str] | None = None):
     fps = 120
     clock = pygame.time.Clock()
 
-    current_screen = StartScreen(screen, manager, networking)
+    current_screen = MainScreen(screen, manager, networking)
     
     # 인증 부분
     '''
