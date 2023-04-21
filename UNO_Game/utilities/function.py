@@ -17,7 +17,7 @@ def init(ob) :      #게임 초기화 함수
     random_turn(ob)
     
     ob.openDeck.append(ob.unopenDeck.pop())  # 미오픈 덱의 첫 번째 카드 오픈 덱으로 이동
-    ob.currentCard = pop(ob.openDeck)        # 오픈 덱의 첫번째 카드 저장
+    ob.currentCard = pop(ob.openDeck)        # 오픈 덱의 첫번째 카드 currentCard에 저장
 
     #처음 시작 카드 관련
     start_card(ob)
@@ -45,7 +45,7 @@ def random_turn(ob):    # 턴 랜덤 지정
 def create(ob):
     ob.unopenDeck = []   #unopenDeck: 오픈 안한 모든 카드 집합
     colours = ["Red", "Yellow", "Blue", "Green"]
-    values = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, "Skip", "Riverse", "Draw2", "All_In"]
+    values = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, "Skip", "Reverse", "Draw2", "All_In"]
     #values = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', "Skip", "Reverse", "Draw_Two", "All_In"]
     Wild = ["Color_Change", "Draw4", "Swap"]
    
@@ -79,7 +79,7 @@ def start_card(ob):
         ob.playerList[ob.playerTurn].append(ob.unopenDeck.pop())
         print("시작플레이어인 ",ob.playerTurn,"번째 플레이어가 2장을 먹습니다!")
         set_turn(ob)
-    elif ob.currentCard[1] == "Riverse":
+    elif ob.currentCard[1] == "Reverse":
         print("시작카드가", ob.currentCard,"이기 때문에 순서 전환됩니다!")
         set_turn(ob)
     elif ob.currentCard[0] == "Wild":
@@ -426,7 +426,7 @@ def ai_color_change(ob):
 #순서를 정하는 함수
 def set_turn(ob): 
     try:
-        if ob.currentCard[1] == "Riverse":
+        if ob.currentCard[1] == "Reverse":
             print("순서가 바뀝니다!")
             ob.playDirection *= -1
             ob.playerTurn += ob.playDirection
@@ -483,7 +483,7 @@ def game_end(ob):
 def rank_game(ob, cards):
     sum = 0
     for card in cards:
-        if card[1] == "Draw2" or card[1] == "Riverse" or card[1] == "Skip" or card[1] == "All_In":
+        if card[1] == "Draw2" or card[1] == "Reverse" or card[1] == "Skip" or card[1] == "All_In":
             sum += 20
         elif card[1] == "Draw4" or card[1] == "Color_Change":
             sum += 50

@@ -9,7 +9,8 @@ from classes.game.game_class import GameInit
 from utilities.function import init
 from utilities.function import split_cards
 
-
+from classes.game.game_class import GameInit
+from classes.cards.card_load import CardLoad
 from client.networking import Networking
 from screens.abc_screen import Screen
 
@@ -49,6 +50,9 @@ class MainScreen(Screen):
                 text=str("UNO"),
                 manager=manager
             )
+
+        # 카드 덱 (미오픈) 이미지 로드
+        self.card_back = pygame.image.load("assets/images/cards/card_back.png")
         
         # 게임 객체 생성
         self.game_init = GameInit()
@@ -56,11 +60,16 @@ class MainScreen(Screen):
 
         # 게임 초기화 (카드 생성, 셔플, 맨 위 카드 꺼내기)
         init(self.game_init)
+
+        # currentCard 객체 생성 (이미지 로드)
+        self.currentCardImage = CardLoad(self.game_init.currentCard)
+        
         # 카드 나눠주기
         split_cards(self.game_init)
 
+        # user 카드 나눠주기 (이미지 로드)
 
-
+        # computer 카드 나눠주기 (뒷면 이미지 로드)
 
 
     # 이벤트 처리 함수
@@ -82,6 +91,12 @@ class MainScreen(Screen):
             
         # 컴퓨터 플레이어 텍스트
         self.screen.blit(self.text_computer_player1, (570, 20))
+
+        # 카드 덱
+        self.screen.blit(self.card_back, (60, 60))
+
+        # currentCard
+        self.currentCardImage.current_card_draw(self.screen)
 
 
         for event in events:
