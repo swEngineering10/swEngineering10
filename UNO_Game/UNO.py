@@ -9,7 +9,7 @@ import pygame.freetype
 from pygame.surface import Surface
 from pygame.event import Event
 
-from networking import Networking
+from client.networking import Networking
 from screens.abc_screen import Screen
 # from screens.main_screen import MainScreen
 from screens.start_screen import StartScreen
