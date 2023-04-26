@@ -2,30 +2,30 @@ import pygame
 import pygame_gui
 import json
 
-screen_width = 800
-screen_height = 600
+# json 파일 로드
+with open('display_config.json', 'r') as f:
+    config_data = json.load(f)
+
+    # json 파일로부터 받은 해상도 값 반영
+screen_width = config_data['resolution']['width']
+screen_height = config_data['resolution']['height']
 
 data = {"resolution": {"width": screen_width, "height": screen_height}}
+
+with open('keys.json', 'r') as f:
+    keyboard_data = json.load(f)
+
+key_up = keyboard_data["keyboard"]["up"]
+key_down = keyboard_data["keyboard"]["down"]
+key_left = keyboard_data["keyboard"]["left"]
+key_right = keyboard_data["keyboard"]["right"]
+keyboard_data = {"keyboard": {"up": key_up,
+                              "down": key_down, "left": key_left, "right": key_right}}
 
 pygame.init()
 font = pygame.font.SysFont(None, 100)
 text = font.render("KEY SETTING", True, (255, 255, 255))
 text_rect = text.get_rect(center=(screen_width//2, screen_height//2 * 0.4))
-
-DEFAULT_KEYS = {
-    "UP": "up",
-    "DOWN": "down",
-    "LEFT": "left",
-    "RIGHT": "right"
-}
-
-KEYS_FILE_PATH = "keys.json"
-
-try:
-    with open(KEYS_FILE_PATH, "r") as f:
-        keys = json.load(f)
-except:
-    keys = DEFAULT_KEYS
 
 
 class KeyChanger:
@@ -34,10 +34,10 @@ class KeyChanger:
         self.font = font
         if keys is None:
             self.keys = {
-                pygame.K_UP: '↑',
-                pygame.K_DOWN: '↓',
-                pygame.K_LEFT: '←',
-                pygame.K_RIGHT: '→'
+                pygame.K_UP: keyboard_data["keyboard"]["up"],
+                pygame.K_DOWN: keyboard_data["keyboard"]["down"],
+                pygame.K_LEFT: keyboard_data["keyboard"]["left"],
+                pygame.K_RIGHT: keyboard_data["keyboard"]["right"]
             }
         else:
             self.keys = keys
@@ -46,28 +46,28 @@ class KeyChanger:
         self.up_button = pygame_gui.elements.UIButton(
             relative_rect=pygame.Rect(
                 (screen_width // 2 * 0.75, screen_height // 2 * 0.7), (200, 50)),
-            text='UP Key: ' + pygame.key.name(self.keys[pygame.K_UP]),
+            text='UP Key',
             manager=self.manager
         )
 
         self.down_button = pygame_gui.elements.UIButton(
             relative_rect=pygame.Rect(
                 (screen_width // 2 * 0.75, screen_height // 2 * 0.7 * 1.4), (200, 50)),
-            text='DOWN Key: ' + pygame.key.name(self.keys[pygame.K_DOWN]),
+            text='DOWN Key',
             manager=self.manager
         )
 
         self.left_button = pygame_gui.elements.UIButton(
             relative_rect=pygame.Rect(
                 (screen_width // 2 * 0.75, screen_height // 2 * 0.7 * 1.8), (200, 50)),
-            text='LEFT Key: ' + pygame.key.name(self.keys[pygame.K_LEFT]),
+            text='LEFT Key',
             manager=self.manager
         )
 
         self.right_button = pygame_gui.elements.UIButton(
             relative_rect=pygame.Rect(
                 (screen_width // 2 * 0.75, screen_height // 2 * 0.7 * 2.2), (200, 50)),
-            text='RIGHT Key: ' + pygame.key.name(self.keys[pygame.K_RIGHT]),
+            text='RIGHT Key',
             manager=self.manager
         )
 
@@ -121,23 +121,25 @@ class KeyChanger:
 
         self.keys[key] = new_key
 
-        print(pygame.key.name(new_key))
-
 
 screen = pygame.display.set_mode((screen_width, screen_height))
-
 keys = {pygame.K_UP: pygame.K_UP, pygame.K_DOWN: pygame.K_DOWN,
         pygame.K_LEFT: pygame.K_LEFT, pygame.K_RIGHT: pygame.K_RIGHT}
 key_changer = KeyChanger(screen, font, keys)
 key_changer.run()
 
-new_up_key = pygame.K_UP
-keys["UP"] = new_up_key
-keys["DOWN"] = pygame.K_DOWN
-keys["LEFT"] = pygame.K_LEFT
-keys["RIGHT"] = pygame.K_RIGHT
 
-with open(KEYS_FILE_PATH, "w") as f:
-    json.dump(keys, f)
+new_up_key = keys[pygame.K_UP]
+new_down_key = keys[pygame.K_DOWN]
+new_left_key = keys[pygame.K_LEFT]
+new_right_key = keys[pygame.K_RIGHT]
+
+keyboard_data["keyboard"]["up"] = new_up_key
+keyboard_data["keyboard"]["down"] = new_down_key
+keyboard_data["keyboard"]["left"] = new_left_key
+keyboard_data["keyboard"]["right"] = new_right_key
+
+with open('keys.json', 'w') as f:
+    json.dump(keyboard_data, f)
 
 pygame.quit()
