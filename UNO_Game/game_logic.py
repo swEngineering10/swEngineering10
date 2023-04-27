@@ -2,6 +2,8 @@ import random
 from random import randint
 import time
 
+from AIplayer import *
+
 
 # 덱의 가장 위 카드를 뽑아내는 함수
 def pop(cards): 
