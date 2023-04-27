@@ -4,6 +4,7 @@ from classes.cards.card import Card
 from classes.enums.directions import Directions
 from utilities.player_utility import next_player_index
 
+
 @dataclass
 class SpecialCard(Card):
     def __post_init__(self):
@@ -14,12 +15,14 @@ class SpecialCard(Card):
             return True
         else:
             return False
-    
+
+
 @dataclass
 class GetTwoCard(SpecialCard):
     @staticmethod
     def move(game):
         game.users[next_player_index(game.cur_user_index, game.direction)].deck.random_cards(2)
+
 
 @dataclass
 class ReverseCard(SpecialCard):

@@ -1,63 +1,77 @@
 import pygame
+import pygame.freetype
 import pygame_gui
-import sys
+import json
+from pygame.event import Event
+from pygame.surface import Surface
+from pygame_gui.elements import UITextEntryLine, UIButton
+
+from client.networking import Networking
+from screens.abc_screen import Screen
+from screens.lobby_screen import LobbyScreen
+from screens.setting_screen import SettingScreen
+from screens.mode_screen import ModeScreen
 
 
-class MainScreen:
-    def __init__(self):
-        self.width = 800
-        self.height = 600
-        self.screen = None
+class StartScreen(Screen):
+    def __init__(self, surface: Surface, manager: pygame_gui.UIManager, networking: Networking):
+        super().__init__(surface, manager, networking)
 
+        # json 파일 로드
+        with open('display_config.json', 'r') as f:
+            config_data = json.load(f)
 
-basic = MainScreen()
-pygame.init()
+        with open('keys.json', 'r') as f:
+            keyboard_data = json.load(f)
 
-screen_width = basic.width
-screen_height = basic.height
+        self.key_up = keyboard_data["keyboard"]["up"]
+        self.key_down = keyboard_data["keyboard"]["down"]
 
-screen = pygame.display.set_mode((screen_width, screen_height))
-pygame.display.set_caption("UNO GAME")
+        self.screen_width = config_data['resolution']['width']
+        self.screen_height = config_data['resolution']['height']
+        WINDOW_SIZE = (self.screen_width, self.screen_height)
 
-manager = pygame_gui.UIManager((screen_width, screen_height))
+        self.background = pygame.Surface(WINDOW_SIZE)
+        self.screen = pygame.display.set_mode((WINDOW_SIZE))
+        self.screen_width, self.screen_height = WINDOW_SIZE
+        self.next_screen = ModeScreen
 
+        # UNO 텍스트 생성
+        self.font = pygame.font.SysFont(None, 100)
+        self.text = self.font.render("UNO", True, (255, 255, 255))
+        self.text_rect = self.text.get_rect(
+            center=(self.screen_width//2, self.screen_height*0.3))
 
-def play_mode_function():
-    print('Button1 clicked!')
+        # 버튼 생성
+        self.button1 = pygame_gui.elements.UIButton(relative_rect=pygame.Rect(
+            self.screen_width // 2 - 100, self.screen_height // 2, 200, 50), text='SINGLE PLAY', manager=manager)
+        self.button2 = pygame_gui.elements.UIButton(relative_rect=pygame.Rect(
+            self.screen_width // 2 - 100, self.screen_height // 2 * 1.3, 200, 50), text='SETTING', manager=manager)
+        self.button3 = pygame_gui.elements.UIButton(relative_rect=pygame.Rect(
+            self.screen_width // 2 - 100, self.screen_height // 2 * 1.6, 200, 50), text='EXIT', manager=manager)
 
+        buttons = [self.button1, self.button2, self.button3]
 
-def setting_mode_function():
-    print('Button2 clicked!')
-
-
-def exit_mode_function():
-    pygame.quit()
-    quit()
-
-
-button1 = pygame_gui.elements.UIButton(relative_rect=pygame.Rect(
-    basic.width // 2 - 100, basic.height // 2, 200, 50), text='SINGLE PLAY', manager=manager)
-button2 = pygame_gui.elements.UIButton(relative_rect=pygame.Rect(
-    basic.width // 2 - 100, basic.height // 2 * 1.3, 200, 50), text='SETTING', manager=manager)
-button3 = pygame_gui.elements.UIButton(relative_rect=pygame.Rect(
-    basic.width // 2 - 100, basic.height // 2 * 1.6, 200, 50), text='EXIT', manager=manager)
-
-# button dictionary
-button_functions = {button1: play_mode_function,
-                    button2: setting_mode_function, button3: exit_mode_function}
-
-# 키보드로 버튼 클릭을 제어하는 객체 생성
-
-
-class KeyboardController:
-    def __init__(self, buttons):
         self.buttons = buttons
         self.selected_button_index = 0
         self.buttons[self.selected_button_index]._set_active()
 
+    def play_mode_function(self):
+        self.next_screen = ModeScreen
+        self.is_running = False
+
+    def setting_mode_function(self):
+        self.next_screen = SettingScreen
+        self.is_running = False
+
+    def exit_mode_function(self):
+        print('Exit!')
+        pygame.quit()
+        quit()
+
     def handle_event(self, event):
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_UP:
+            if event.key == self.key_up:
                 self.selected_button_index = (
                     self.selected_button_index - 1) % len(self.buttons)
                 self.buttons[self.selected_button_index]._set_active()
@@ -65,7 +79,7 @@ class KeyboardController:
                              len(self.buttons)].unselect()
                 self.buttons[(self.selected_button_index + 1) %
                              len(self.buttons)].enable()
-            elif event.key == pygame.K_DOWN:
+            elif event.key == self.key_down:
                 self.selected_button_index = (
                     self.selected_button_index + 1) % len(self.buttons)
                 self.buttons[(self.selected_button_index) %
@@ -76,57 +90,32 @@ class KeyboardController:
                              len(self.buttons)].enable()
             elif event.key == pygame.K_RETURN:
                 clicked_button = self.buttons[self.selected_button_index]
-                if clicked_button in button_functions.keys():
-                    button_functions[clicked_button]()
-                elif self.selected_button_index == len(self.buttons) - 1:
-                    pygame.quit()
-                    sys.exit()
+                if clicked_button == self.button1:
+                    self.play_mode_function()
+                elif clicked_button == self.button2:
+                    self.setting_mode_function()
+                else:
+                    self.exit_mode_function()
+        if event.type == pygame_gui.UI_BUTTON_PRESSED:
+            for i, button in enumerate(self.buttons):
+                if event.ui_element == button:
+                    if button == self.button1:
+                        self.play_mode_function()
+                    elif button == self.button2:
+                        self.setting_mode_function()
+                    else:
+                        self.exit_mode_function()
 
-    def draw(self, surface):
-        pass
+     # run 함수
 
+    def run(self, events: list[Event]) -> bool:
 
-# 키보드로 제어할 버튼 객체 리스트 생성
-keyboard_buttons = [button1, button2, button3]
+        self.screen.blit(self.background, (0, 0))
+        self.screen.blit(self.text, self.text_rect)
 
-# 키보드 컨트롤러 객체 생성
-keyboard_controller = KeyboardController(keyboard_buttons)
+        for event in events:
+            self.handle_event(event)
 
-# 폰트 설정
-font = pygame.font.SysFont(None, 100)
-
-# "UNO" 텍스트 생성
-text = font.render("UNO", True, (255, 255, 255))
-
-# 텍스트의 중심 좌표 계산
-text_rect = text.get_rect(center=(basic.width//2, basic.height//2 - 100))
-
-# pygame_gui의 UILabel 생성
-label = pygame_gui.elements.UILabel(
-    relative_rect=text_rect,
-    text="",
-    manager=manager
-)
-
-# 게임 루프
-while True:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            sys.exit()
-
-        manager.process_events(event)
-        keyboard_controller.handle_event(event)
-
-        # 마우스 클릭시 버튼 함수 실행
-        if event.type == pygame.MOUSEBUTTONUP:
-            for button in button_functions.keys():
-                if button.rect.collidepoint(event.pos):
-                    button_functions[button]()
-
-    manager.update(1 / 60)
-    screen.fill((0, 0, 0))
-    keyboard_controller.draw(screen)
-    screen.blit(text, text_rect)
-    manager.draw_ui(screen)
-    pygame.display.flip()
+        if self.networking.current_game.is_started:
+            self.is_running = False
+        return self.is_running

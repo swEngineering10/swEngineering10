@@ -29,11 +29,13 @@ OTHER_CARDS = []
 
 for i in range(2):
     for color in [Colors.BLUE, Colors.RED, Colors.GREEN, Colors.YELLOW]:
+        # карты с номерами
         for num in range(0, 10) if i == 0 else range(1, 10):
             COLOR_CARDS.append(NumericCard(color, num))
+        # специальные карты
         for card in [SkipCard, ReverseCard, GetTwoCard]:
             OTHER_CARDS.append(card(color))
-            
+# дикие карты
 for i in range(4):
     OTHER_CARDS.append(WildChangeColorCard())
     OTHER_CARDS.append(WildGetFourCard())
