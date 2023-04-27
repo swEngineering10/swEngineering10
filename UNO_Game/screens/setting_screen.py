@@ -9,7 +9,6 @@ from pygame_gui.elements.ui_button import UIButton
 from client.networking import Networking
 from screens.abc_screen import Screen
 from screens.volume_screen import VolumeScreen
-from screens.keysetting_screen import KeySetting
 
 
 class SettingScreen(Screen):
@@ -139,8 +138,7 @@ class SettingScreen(Screen):
                 self.next_screen = StartScreen
                 self.is_running = False
             elif event.ui_element == self.keyboard_button:
-                self.next_screen = KeySetting
-                self.is_running = False
+                pass
 
      # run 함수
     def run(self, events: list[Event]) -> bool:
