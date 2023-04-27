@@ -6,6 +6,7 @@ from pygame.event import Event
 from pygame.surface import Surface
 from pygame_gui.elements import UITextEntryLine, UIButton
 
+from utility import resolution
 from client.networking import Networking
 from screens.abc_screen import Screen
 from screens.lobby_screen import LobbyScreen
@@ -17,12 +18,7 @@ class StartScreen(Screen):
     def __init__(self, surface: Surface, manager: pygame_gui.UIManager, networking: Networking):
         super().__init__(surface, manager, networking)
 
-        # json 파일 로드
-        with open('display_config.json', 'r') as f:
-            config_data = json.load(f)
-
-        self.screen_width = config_data['resolution']['width']
-        self.screen_height = config_data['resolution']['height']
+        self.screen_width, self.screen_height = resolution()
         WINDOW_SIZE = (self.screen_width, self.screen_height)
 
         self.background = pygame.Surface(WINDOW_SIZE)
