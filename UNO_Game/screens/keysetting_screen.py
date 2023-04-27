@@ -1,3 +1,4 @@
+# 모듈화 진행 필요
 import pygame
 import pygame_gui
 import json
