@@ -26,6 +26,8 @@ class StartScreen(Screen):
 
         self.key_up = keyboard_data["keyboard"]["up"]
         self.key_down = keyboard_data["keyboard"]["down"]
+        self.key_left = keyboard_data["keyboard"]["left"]
+        self.key_right = keyboard_data["keyboard"]["right"]
 
         self.screen_width = config_data['resolution']['width']
         self.screen_height = config_data['resolution']['height']
@@ -41,6 +43,25 @@ class StartScreen(Screen):
         self.text = self.font.render("UNO", True, (255, 255, 255))
         self.text_rect = self.text.get_rect(
             center=(self.screen_width//2, self.screen_height*0.3))
+
+        # 키보드 설정 텍스트 생성
+        self.font2 = pygame.font.SysFont(None, 40)
+        self. text2 = self.font2.render(
+            "Up:" + pygame.key.name(self.key_up), True, (255, 255, 255))
+        self.text2_rect = self.text2.get_rect(
+            center=(self.screen_width // 2 * 0.3, self.screen_height * 0.65))
+        self. text3 = self.font2.render(
+            "Down:" + pygame.key.name(self.key_down), True, (255, 255, 255))
+        self.text3_rect = self.text3.get_rect(
+            center=(self.screen_width // 2 * 0.3, self.screen_height * 0.75))
+        self. text4 = self.font2.render(
+            "Left:" + pygame.key.name(self.key_left), True, (255, 255, 255))
+        self.text4_rect = self.text4.get_rect(
+            center=(self.screen_width // 2 * 0.3, self.screen_height * 0.85))
+        self. text5 = self.font2.render(
+            "Right:" + pygame.key.name(self.key_right), True, (255, 255, 255))
+        self.text5_rect = self.text5.get_rect(
+            center=(self.screen_width // 2 * 0.3, self.screen_height * 0.95))
 
         # 버튼 생성
         self.button1 = pygame_gui.elements.UIButton(relative_rect=pygame.Rect(
@@ -112,6 +133,10 @@ class StartScreen(Screen):
 
         self.screen.blit(self.background, (0, 0))
         self.screen.blit(self.text, self.text_rect)
+        self.screen.blit(self.text2, self.text2_rect)
+        self.screen.blit(self.text3, self.text3_rect)
+        self.screen.blit(self.text4, self.text4_rect)
+        self.screen.blit(self.text5, self.text5_rect)
 
         for event in events:
             self.handle_event(event)
