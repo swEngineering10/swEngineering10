@@ -5,12 +5,12 @@ import json
 from pygame.surface import Surface
 from pygame.event import Event
 from pygame_gui.elements.ui_button import UIButton
-from classes.game.game_class import GameInit
-from utilities.function import init
-from utilities.function import split_cards
+from game_class import GameInit
+from game_logic import init
+from game_logic import split_cards
 
-from classes.game.game_class import GameInit
-from classes.cards.card_load import CardLoad
+from game_class import GameInit
+from utility import CardLoad
 from client.networking import Networking
 from screens.abc_screen import Screen
 
