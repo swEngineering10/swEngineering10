@@ -70,7 +70,7 @@ def main(start_auth: tuple[str, str] | None = None):
     fps = 120
     clock = pygame.time.Clock()
 
-    current_screen = VolumeScreen(screen, manager, networking)
+    current_screen = MainScreen(screen, manager, networking)
 
     # 인증 부분
     '''
