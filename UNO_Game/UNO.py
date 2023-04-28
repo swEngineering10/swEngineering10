@@ -14,6 +14,7 @@ from screens.abc_screen import Screen
 # from screens.main_screen import MainScreen
 from screens.start_screen import StartScreen
 from screens.main_screen import MainScreen
+from screens.volume_screen import VolumeScreen
 
 from utilities.image_utility import load_image
 from utilities.text_utility import truncate
@@ -51,15 +52,17 @@ pygame.mixer.music.play()
 # UI manager 생성
 manager = pygame_gui.UIManager(WINDOW_SIZE)
 
-FETCH_RATE = 30 # : Networking 객체로부터 게임 상태를 가져오는 주기를 정의하는 변수 선언
-SERVER_IP = '127.0.0.1' # 서버의 IP 주소를 설정 (localhost)
+FETCH_RATE = 30  # : Networking 객체로부터 게임 상태를 가져오는 주기를 정의하는 변수 선언
+SERVER_IP = '127.0.0.1'  # 서버의 IP 주소를 설정 (localhost)
+
 
 def terminate():
     pygame.quit()
     sys.exit()
 
+
 def main(start_auth: tuple[str, str] | None = None):
-    networking = Networking() # SERVER_IP 인자 제외
+    networking = Networking()  # SERVER_IP 인자 제외
 
     pygame.display.set_caption('PyUnoGame')
 
@@ -67,8 +70,8 @@ def main(start_auth: tuple[str, str] | None = None):
     fps = 120
     clock = pygame.time.Clock()
 
-    current_screen = MainScreen(screen, manager, networking)
-    
+    current_screen = StartScreen(screen, manager, networking)
+
     # 인증 부분
     '''
     if start_auth:
@@ -84,24 +87,28 @@ def main(start_auth: tuple[str, str] | None = None):
             networking.fetch()
         fetched_ticks += 1
         '''
-        time_delta = clock.tick(fps) / 1000.0 # 시간 경과를 계산합니다.
+        time_delta = clock.tick(fps) / 1000.0  # 시간 경과를 계산합니다.
         events = []
 
-        for event in pygame.event.get(): # 발생한 모든 이벤트를 가져와서 처리합니다.
-            if event.type == pygame.QUIT: # 창을 닫기 버튼을 눌렀을 경우, 게임을 종료합니다.
+        for event in pygame.event.get():  # 발생한 모든 이벤트를 가져와서 처리합니다.
+            if event.type == pygame.QUIT:  # 창을 닫기 버튼을 눌렀을 경우, 게임을 종료합니다.
                 running = False
-            else: # 이외의 이벤트가 발생한 경우, events 리스트에 추가합니다.
+            else:  # 이외의 이벤트가 발생한 경우, events 리스트에 추가합니다.
                 events.append(event)
             manager.process_events(event)
 
         manager.update(time_delta)
-        if hasattr(current_screen, 'run'): #  현재 화면에 'run' 메서드가 있다면, current_screen.run(events) 함수를 호출하여 화면을 업데이트합니다.
-            if not current_screen.run(events): # run' 메서드가 False를 반환한다면, 다음 화면으로 전환합니다.
+        # 현재 화면에 'run' 메서드가 있다면, current_screen.run(events) 함수를 호출하여 화면을 업데이트합니다.
+        if hasattr(current_screen, 'run'):
+            # run' 메서드가 False를 반환한다면, 다음 화면으로 전환합니다.
+            if not current_screen.run(events):
                 manager.clear_and_reset()   # 이부분 위로 올림 (스크린 객체생성보다 아래로 가면 버튼 객체 지워버림)
-                current_screen = current_screen.next_screen(screen, manager, networking) # 현재 화면의 다음 화면을 가져옵니다.
-                
+                # 현재 화면의 다음 화면을 가져옵니다.
+                current_screen = current_screen.next_screen(
+                    screen, manager, networking)
+
         else:
-            terminate()  
+            terminate()
 
         manager.draw_ui(screen)
         pygame.display.flip()
@@ -109,8 +116,9 @@ def main(start_auth: tuple[str, str] | None = None):
     terminate()
 
 
-if __name__ == '__main__': # 스크립트가 직접 실행될 때, main() 함수를 실행합니다.
-    if len(sys.argv) > 1: # 스크립트가 실행될 때 전달된 인자가 있는지 확인합니다.
-        main((sys.argv[1], sys.argv[2])) # 전달된 인자가 있다면, main() 함수를 인자와 함께 실행합니다.
-    else: # 전달된 인자가 없다면, main() 함수를 인자 없이 실행합니다.
+if __name__ == '__main__':  # 스크립트가 직접 실행될 때, main() 함수를 실행합니다.
+    if len(sys.argv) > 1:  # 스크립트가 실행될 때 전달된 인자가 있는지 확인합니다.
+        # 전달된 인자가 있다면, main() 함수를 인자와 함께 실행합니다.
+        main((sys.argv[1], sys.argv[2]))
+    else:  # 전달된 인자가 없다면, main() 함수를 인자 없이 실행합니다.
         main()
