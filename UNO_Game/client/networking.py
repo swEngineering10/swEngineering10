@@ -67,42 +67,58 @@ class Networking:
     '''
 
     # 사용자가 카드를 낼 때 호출되는 메서드입니다. card와 ignore를 송신하여 카드를 낼 수 있는지 여부를 서버로부터 받아옵니다.
+    '''
     def throw_card(self, card: int | Card, ignore: bool = False) -> bool:
         data = {'type': 'throw', 'card': card, 'ignore': ignore}
         self.sock.sendall(pickle.dumps(data))
         return pickle.loads(self.sock.recv(2048))
+    '''
 
     # 사용자가 카드를 뽑을 때 호출되는 메서드입니다. 서버로부터 뽑을 수 있는지 여부를 받아옵니다.
+    '''
     def get_card(self) -> bool:
         data = {'type': 'get_card'}
         self.sock.sendall(pickle.dumps(data))
         return pickle.loads(self.sock.recv(2048))
+    '''
     
     # 사용자의 점수를 증가시키는 메서드입니다. amount를 송신하여 서버로부터 증가한 점수를 받아옵니다.
+    '''
     def add_points(self, amount: int = 0) -> bool:
         data = {'type': 'add_points', 'amount': amount}
         self.sock.sendall(pickle.dumps(data))
         return pickle.loads(self.sock.recv(2048))
+    '''
 
     # 사용자가 'Uno'를 외칠 때 호출되는 메서드입니다. 서버로부터 성공 여부를 받아옵니다.
+    '''
     def say_uno(self) -> bool:
         data = {'type': 'say_uno'}
         self.sock.sendall(pickle.dumps(data))
         return pickle.loads(self.sock.recv(2048))
+    '''
 
     #  현재 게임에서 authorized_user와 일치하는 User 객체를 반환합니다.
+    '''
     def get_user_from_game(self) -> User:
         return [user for user in self.current_game.users if user.id == self.authorized_user.id][0]
+    '''
 
     # 사용자 객체의 인덱스를 반환합니다.
+    '''
     def user_id(self, user) -> int:
         return self.current_game.users.index(user)
+    '''
     
     # 현재 사용자의 차례인지 여부를 반환합니다.
+    '''
     @property
     def is_our_move(self) -> bool:
         return self.current_game.cur_user_index == self.user_id(self.get_user_from_game())
+    '''
 
     # 클래스 인스턴스가 소멸될 때 호출되는 메서드입니다. 소켓 연결을 닫습니다.
+    '''
     def __del__(self):
         self.sock.close()
+    '''
