@@ -21,6 +21,10 @@ class LobbyScreen(Screen):
         self.screen_width, self.screen_height = WINDOW_SIZE
         # self.next_screen = MainScreen
 
+        # 다음 화면으로 전달해야 할 변수
+        self.computer_number = 1
+        self.user_name = "user"
+
         # User Name 텍스트 내용 및 크기, 위치
         self.text_username_content = "User Name"
         self.font_username = pygame.font.Font(None, 50)
@@ -103,19 +107,38 @@ class LobbyScreen(Screen):
                 button.set_text("+")
             else:
                 button.disable()
+            
+    # selected인 버튼의 개수 (computer player 수)
+    def selected_number(self):
+        count = 0
+        for i in range(5):
+            if (self.button_states[i] == "selected") :
+                count += 1
+        self.computer_number  = count
+        print(self.computer_number)
+
 
     # 이벤트 처리 함수
     def handle_event(self, event):
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            quit()
-        elif event.type == pygame_gui.UI_BUTTON_PRESSED:
+        if event.type == pygame_gui.UI_BUTTON_PRESSED:
             for i, button in enumerate(self.add_player_buttons):
                 if event.ui_element == button:
                     self.button_index = i
                     self.add_player_button_logic()
                     
             self.update_add_player_buttons()
+            self.selected_number()
+                
+            if event.ui_element == self.start_button:
+                if self.username_entry.get_text() == "" :
+                    pass
+                else :
+                    self.user_name = self.username_entry.get_text()
+                print(self.user_name)
+                # self.next_screen = MainScreen
+                # self.is_running = False
+
+
 
     # 버튼 로직 함수
     def add_player_button_logic(self):
