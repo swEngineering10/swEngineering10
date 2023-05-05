@@ -135,8 +135,8 @@ def exit_button(self):
     self.running = False
 
 def draw(self):
-    self.screen.blit(pygame.image.load(r"assets\images\cards\UNO_Button.png"), self.uno_button.get_rect())
-    '''
+    self.screen.blit(pygame.image.load(r"assets/images/cards/UNO_Button.png"), self.uno_button.get_rect())
+'''
     
 # 카드 클릭 이벤트
 ############# 바꿔야함!!!!!!!! ################
