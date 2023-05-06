@@ -2,8 +2,14 @@ import pygame
 import pygame.freetype
 import pygame_gui
 import json
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
+
 from pygame.surface import Surface
 from pygame.event import Event
+
+
 
 from game_logic import init
 from game_logic import split_cards
@@ -12,7 +18,6 @@ from utility import resolution
 from utility import BackGround
 from game_class import GameInit
 from utility import CardLoad
-from utility import PlayerState
 from client.networking import Networking
 from screens.abc_screen import Screen
 
@@ -41,7 +46,7 @@ class MainScreen(Screen):
 
         # 카드 덱 (미오픈) 이미지 로드
         # 주의점 : 만약에 카드를 다 썼다면 지우는게 맞는듯!!
-        self.card_back = CardLoad(("card", "back"))
+        self.card_back = pygame.image.load("C:/Python/3_1_project/10weeks_2/UNO_Game/assets/images/cards/card_back.png")
         
         # 게임 객체 생성
         self.game_init = GameInit()
@@ -62,8 +67,7 @@ class MainScreen(Screen):
             self.my_card_list.append(CardLoad(self.game_init.playerList[0][i]))
             self.my_card_list[i].card_pop_image(self.my_card_list)
 
-        # computer player 이미지 객체 생성
-        self.player1 = PlayerState(1)
+        # computer 카드 나눠주기 (뒷면 이미지 로드)
 
 
     # 이벤트 처리 함수
@@ -77,16 +81,16 @@ class MainScreen(Screen):
         
         # 배경화면
         self.background.background_draw(self.screen)
+
         # 카드 덱
-        self.card_back.card_draw(self.screen, self.card_back.deck_pos)
+        self.screen.blit(self.card_back, (60, 60))
+
         # currentCard 이미지
-        self.currentCardImage.card_draw(self.screen, self.currentCardImage.current_card_pos)
-        # 처음 카드 7장 (애니메이션 포함)
+        self.currentCardImage.current_card_draw(self.screen)
+
+        # 처음 카드 7장
         for i in range(len(self.my_card_list)):
             self.my_card_list[i].image_animation(self.screen)
-        # 컴퓨터 플레이어 카드 로드
-        self.player1.player_state_draw(self.screen)
-
 
         for event in events:
             self.handle_event(event)
