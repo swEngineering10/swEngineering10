@@ -15,6 +15,7 @@ from game_logic import init
 from game_logic import split_cards
 from utility import resolution
 
+from utility import PlayerState
 from utility import BackGround
 from game_class import GameInit
 from utility import CardLoad
@@ -46,7 +47,7 @@ class MainScreen(Screen):
 
         # 카드 덱 (미오픈) 이미지 로드
         # 주의점 : 만약에 카드를 다 썼다면 지우는게 맞는듯!!
-        self.card_back = pygame.image.load("C:/Python/3_1_project/10weeks_2/UNO_Game/assets/images/cards/card_back.png")
+        self.card_back = CardLoad(("card", "back"))
         
         # 게임 객체 생성
         self.game_init = GameInit()
@@ -67,13 +68,26 @@ class MainScreen(Screen):
             self.my_card_list.append(CardLoad(self.game_init.playerList[0][i]))
             self.my_card_list[i].card_pop_image(self.my_card_list)
 
-        # computer 카드 나눠주기 (뒷면 이미지 로드)
+        # computer player 이미지 객체 생성
+        self.player1 = PlayerState(1)
 
 
     # 이벤트 처리 함수
     def handle_event(self, event):
         if event.type == pygame_gui.UI_BUTTON_PRESSED:
             pass
+
+    '''
+    # 이벤트 처리 함수
+    def handle_event(self, event):
+        if event.type == pygame_gui.UI_BUTTON_PRESSED:
+            pass
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            mouse_pos = pygame.mouse.get_pos()
+            for i in range (len(self.my_card_list)) :
+                if self.my_card_list[i].image_rect.collidepoint(mouse_pos):
+                    print(str(self.my_card_list[i].card_value) + "카드 클릭")
+    '''
 
 
     # run 함수
@@ -83,14 +97,17 @@ class MainScreen(Screen):
         self.background.background_draw(self.screen)
 
         # 카드 덱
-        self.screen.blit(self.card_back, (60, 60))
+        self.card_back.card_draw(self.screen, self.card_back.deck_pos)
 
         # currentCard 이미지
-        self.currentCardImage.current_card_draw(self.screen)
+        self.currentCardImage.card_draw(self.screen, self.currentCardImage.current_card_pos)
 
         # 처음 카드 7장
         for i in range(len(self.my_card_list)):
             self.my_card_list[i].image_animation(self.screen)
+
+        # 컴퓨터 플레이어 카드 로드
+        self.player1.player_state_draw(self.screen)
 
         for event in events:
             self.handle_event(event)
