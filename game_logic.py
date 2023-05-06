@@ -10,6 +10,7 @@ def pop(cards):
 
 
 def init(ob) :      #게임 초기화 함수
+    print("실 험 !")
     create(ob)      #카드 생성 함수
     random.shuffle(ob.unopenDeck)   # 카드 랜덤하게 섞기
          
