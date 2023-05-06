@@ -1,4 +1,4 @@
-import sys
+'''import sys
 import pygame
 
 pygame.init()
@@ -11,10 +11,10 @@ font = pygame.font.SysFont('Arial', 40)
 
 objects = []
 
-button_image = pygame.image.load(r"assets\images\cards\UNO_Button.png")
+button_image = pygame.image.load(r"assets/images/cards/UNO_Button.png")
 button_scale = pygame.transform.scale(button_image, (100, 100))
-pygame.image.save(button_scale, r"assets\images\cards\UNO_Button.png")
-button_image = pygame.image.load(r"assets\images\cards\UNO_Button.png")
+pygame.image.save(button_scale, r"assets/images/cards/UNO_Button.png")
+button_image = pygame.image.load(r"assets/images/cards/UNO_Button.png")
 
 class Button():
     def __init__(self, x, y, image):
@@ -51,10 +51,10 @@ while True:
     button.draw(screen)
     pygame.display.flip()
     fpsClock.tick(fps)
+'''
 
 
-
-    '''
+'''
     def __init__(self, x, y, width, height, image, onclickFunction=None, onePress=False):
         self.x = x
         self.y = y

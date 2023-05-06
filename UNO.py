@@ -19,6 +19,9 @@ from screens.volume_screen import VolumeScreen
 from utilities.image_utility import load_image
 from utilities.text_utility import truncate
 
+#from button import *
+
+
 # pygame 초기화
 pygame.init()
 
@@ -61,7 +64,11 @@ def terminate():
     sys.exit()
 
 
-def main(start_auth: tuple[str, str] | None = None):
+
+
+
+
+def main():
     networking = Networking()  # SERVER_IP 인자 제외
 
     pygame.display.set_caption('PyUnoGame')

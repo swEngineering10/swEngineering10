@@ -2,8 +2,7 @@ import random
 from random import randint
 import time
 
-from AIplayer import *
-
+from common_function import *
 
 # 덱의 가장 위 카드를 뽑아내는 함수
 def pop(cards): 
@@ -352,6 +351,10 @@ def next_turn(ob):
     elif ob.nextTurn == -2:
         ob.nextTurn = ob.numPlayers - 2
     
+    
+
+    
+    
         
 #게임 종료를 판별하는 함수        
 def game_end(ob):
@@ -386,3 +389,6 @@ def print_rank(ob):
     for i in range(0, ob.numPlayers):
         if i != ob.winner:
             print(i,"번째 플레이어: ", ob.score[i])
+            
+            
+           
