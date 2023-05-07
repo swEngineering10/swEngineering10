@@ -22,12 +22,14 @@ class GameInit(object):
 
         self.isCardDrawn = False        # 카드 뽑았는지 여부
         self.isCardPlayed = False       # 카드 냈는지 여부
+        self.PlayedCard = 0             # 몇 번째 카드를 냈는가?
         self.Draw2Attack = False        # Draw2 공격이 진행중인가?
         self.Draw2Count = 0             # Draw2 공격이 몇번 중첩되었는가?
         self.turnCount = 1              # 게임이 시작된 이래로 몇번씩 주고받았는가?
         
+        self.isGameEnd = False  # 게임이 끝났는가?
         self.winner = 0         #승리자 저장 변수
-        self.score = []     #점수 저장 변수
+        self.score = []         #점수 저장 변수
         
         self.smartAi = False    #지역A의 똑똑한 AI인가?
         

@@ -134,11 +134,17 @@ def shuffle_card(ob):
 #플레이어 게임 진행 함수
 def play_game(ob, cards):       
     shuffle_card(ob)
+    print(ob.playerList[0]) # 내 카드 출력 (확인용)
     if ob.Draw2Attack == False:     #Draw2 공격 상태가 아니라면
         print_information(ob, cards)
         
-        #디버그용. pygame 구현시 마우스 터치 이런형태로 바꿔야함
-        a = int(input("몇번째 카드를 내겠습니까? (0: 카드먹기, 1: 첫번째 카드, 2: ...)"))
+        # a = int(input("몇번째 카드를 내겠습니까? (0: 카드먹기, 1: 첫번째 카드, 2: ...)"))
+        # 바꾸어야 하는 코드
+        while True :
+            if ob.isCardPlayed :
+                break
+        a = ob.PlayedCard
+        ob.isCardPlayed = False
         
         if a==0:        #카드 먹기
             add_deck(ob, cards)
@@ -157,7 +163,7 @@ def play_game(ob, cards):
     elif ob.Draw2Attack == True:    #Draw2 공격 상태라면
         print_information_Draw2(ob, cards)
         
-        a = int(input("몇번째 카드를 내겠습니까? (0: 카드먹기, 1: 첫번째 카드, 2: ...)"))
+        # a = int(input("몇번째 카드를 내겠습니까? (0: 카드먹기, 1: 첫번째 카드, 2: ...)"))
         
         if a==0:
             for i in range(0, ob.Draw2Count*2+1):
@@ -179,8 +185,8 @@ def play_game(ob, cards):
             print("\n")
             set_turn(ob)
     ob.turnCount += 1
-    
-    
+
+
 #중복 카드 검사
 def is_repeatedcard(ob, cards):
     ob.available = []
