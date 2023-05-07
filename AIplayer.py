@@ -1,5 +1,5 @@
 from game_logic import *
-
+from common_function import ai_color_change
 
 #ai 게임 진행 함수
 def ai_play_game(ob, cards):        
