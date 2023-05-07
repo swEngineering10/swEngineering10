@@ -1,7 +1,6 @@
 import pygame
 import pygame.freetype
 import pygame_gui
-import json
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
@@ -9,11 +8,13 @@ sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 from pygame.surface import Surface
 from pygame.event import Event
 
-
-
 from game_logic import init
 from game_logic import split_cards
+from game_logic import play_game
+from game_logic import game_end
+from AIplayer import ai_play_game
 from utility import resolution
+from utility import card_click
 
 from utility import PlayerState
 from utility import BackGround
@@ -61,7 +62,6 @@ class MainScreen(Screen):
         
         # 유저 보유 카드 리스트 모두 CardLoad 객체 생성 후 이미지 로드
         split_cards(self.game_init)
-        print(self.game_init.playerList[0]) # 내 카드 출력 (확인용)
 
         self.my_card_list = []
         for i in range(len(self.game_init.playerList[0])) :
@@ -70,6 +70,18 @@ class MainScreen(Screen):
 
         # computer player 이미지 객체 생성
         self.player1 = PlayerState(1)
+<<<<<<< HEAD
+
+        # 게임 시작
+        # self.game()
+
+    def game(self) :
+        if self.game_init.myTurn == self.game_init.playerTurn :
+            play_game(self.game_init, self.game_init.playerList[self.game_init.playerTurn])
+        else:
+            ai_play_game(self.game_init, self.game_init.playerList[self.game_init.playerTurn])
+=======
+>>>>>>> 567d3181f12ca04a4c9556af0ab21bee9df8f2b2
 
 
     # 이벤트 처리 함수
@@ -77,6 +89,14 @@ class MainScreen(Screen):
         if event.type == pygame_gui.UI_BUTTON_PRESSED:
             pass
 
+<<<<<<< HEAD
+    
+    # 이미지 이벤트 처리 함수
+    def handle_event_image(self, event, surface):
+        if event.type == pygame.MOUSEBUTTONUP:
+            mouse_pos = pygame.mouse.get_pos()
+            card_click(self.my_card_list, self.game_init, self.card_back, mouse_pos, surface)
+=======
     '''
     # 이벤트 처리 함수
     def handle_event(self, event):
@@ -88,6 +108,7 @@ class MainScreen(Screen):
                 if self.my_card_list[i].image_rect.collidepoint(mouse_pos):
                     print(str(self.my_card_list[i].card_value) + "카드 클릭")
     '''
+>>>>>>> 567d3181f12ca04a4c9556af0ab21bee9df8f2b2
 
 
     # run 함수
@@ -97,10 +118,17 @@ class MainScreen(Screen):
         self.background.background_draw(self.screen)
 
         # 카드 덱
+<<<<<<< HEAD
+        self.card_back.card_load(self.screen, self.card_back.deck_pos)
+
+        # currentCard 이미지
+        self.currentCardImage.card_load(self.screen, self.currentCardImage.current_card_pos)
+=======
         self.card_back.card_draw(self.screen, self.card_back.deck_pos)
 
         # currentCard 이미지
         self.currentCardImage.card_draw(self.screen, self.currentCardImage.current_card_pos)
+>>>>>>> 567d3181f12ca04a4c9556af0ab21bee9df8f2b2
 
         # 처음 카드 7장
         for i in range(len(self.my_card_list)):
@@ -109,8 +137,16 @@ class MainScreen(Screen):
         # 컴퓨터 플레이어 카드 로드
         self.player1.player_state_draw(self.screen)
 
+<<<<<<< HEAD
+        while self.game_init.running:   # 테스트
+            self.game()
+
+=======
+>>>>>>> 567d3181f12ca04a4c9556af0ab21bee9df8f2b2
         for event in events:
             self.handle_event(event)
+            self.handle_event_image(event, self.screen)
+        
 
         if self.networking.current_game.is_started:
             self.is_running = False
