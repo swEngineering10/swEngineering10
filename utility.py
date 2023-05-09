@@ -1,13 +1,11 @@
 import pygame
 import json
 import math
+import time
 
-<<<<<<< HEAD
 from game_class import *
-from game_logic import *
+# from game_logic import *
 
-=======
->>>>>>> 567d3181f12ca04a4c9556af0ab21bee9df8f2b2
 # 이미지 로드 및 애니메이션을 위한 Card 클래스
 class CardLoad:
     def __init__(self, card_value):
@@ -18,39 +16,30 @@ class CardLoad:
         self.background = BackGround()  # BackGround 객체 생성
         self.current_card_pos = self.opendeck_image_pos()  # currentCard(오픈 카드)일 때 이미지 위치
         self.deck_pos = self.deck_image_pos()    # 덱 좌표
-        self.speed = 5  # 이동 속도
+        self.speed = 10  # 이동 속도
         self.spacing = 15   # myboard와 카드와의 간격
-<<<<<<< HEAD
         self.cards_per_row = 12  # myboard에서 한 줄당 카드의 수
         self.x_interval = self.background.card_pos(self.background.my_board_image.get_rect().size,
                         self.spacing, self.image, self.cards_per_row) # myboard에서 카드끼리의 수평 간격
         self.y_interval = 70 # myboard에서 카드끼리의 수직 간격
         self.position = self.deck_pos  # 현재 position
-        self.origin_pos = [60, 60]
-        self.target_pos = [10, 360]
+        self.origin_pos = self.deck_pos
+        self.target_pos = self.current_card_pos
 
-        self.back_pos()
+        self.set_back_pos()
 
 
-    def back_pos(self) :
+    def set_back_pos(self) :
         if self.card_value == ("card", "back") :
-            self.image_rect.left, self.image_rect.top = self.deck_pos
+            self.image_rect.x, self.image_rect.y = self.deck_pos
+
+    def set_current_pos(self, player_pos) :
+        self.origin_pos = player_pos
+        self.target_pos = self.current_card_pos
+
 
     # 카드 이미지 로드
     def card_load(self, surface, pos):
-=======
-        self.cards_per_row = 7  # myboard에서 한 줄당 카드의 수
-        self.x_interval = self.background.card_pos(self.background.my_board_image.get_rect().size,
-                        self.spacing, self.image, self.cards_per_row) # myboard에서 카드끼리의 수평 간격
-        self.y_interval = 70 # myboard에서 카드끼리의 수직 간격
-        self.position = [0, 0]  # 현재 position
-        self.origin_pos = [60, 60]
-        self.target_pos = [10, 360]
-
-
-    # 카드 이미지 로드
-    def card_draw(self, surface, pos):
->>>>>>> 567d3181f12ca04a4c9556af0ab21bee9df8f2b2
         surface.blit(self.image, pos)
 
     
@@ -67,11 +56,7 @@ class CardLoad:
         x_pos = self.spacing + value2 * self.x_interval
 
         self.target_pos = [x_pos, y_pos]
-<<<<<<< HEAD
         self.position = self.target_pos     # 현재 좌표 설정
-=======
-        self.position = self.target_pos
->>>>>>> 567d3181f12ca04a4c9556af0ab21bee9df8f2b2
     
 
     # 이미지 애니메이션
@@ -87,46 +72,46 @@ class CardLoad:
         self.move_x = self.speed * self.dx / distance  # x축 이동 거리
         self.move_y = self.speed * self.dy / distance  # y축 이동 거리
 
-        self.origin_pos[0] += self.move_x
-        self.origin_pos[1] += self.move_y
+        self.position = self.target_pos # 현재 위치를 target 위치로 설정
 
-        self.image_rect.x = int(self.origin_pos[0])
-        self.image_rect.y = int(self.origin_pos[1])
+        # 부동소수점 때문에 origin_pos가 target_pos가 될 수 없는 문제 해결
+        if distance <= self.speed:
+            self.origin_pos = self.target_pos
+            self.image_rect.x = int(self.origin_pos[0])
+            self.image_rect.y = int(self.origin_pos[1])
+        else:
+            self.origin_pos[0] += self.move_x
+            self.origin_pos[1] += self.move_y
+
+            self.image_rect.x = int(self.origin_pos[0])
+            self.image_rect.y = int(self.origin_pos[1])
 
         surface.blit(self.image, self.image_rect)
 
-<<<<<<< HEAD
+
+    # 다 움직이면 더이상 움직이지 않도록 하는 함수
+    def animation_control(self, surface) :
+        if not self.origin_pos == self.target_pos :
+            self.image_animation(surface)
+            pygame.display.flip()
+        else :
+            self.card_load(surface, self.position)
+
+
     # 카드 내는 함수
-    def play_card_event(self, surface):
+    def play_card_event(self):
         self.origin_pos = self.position
         self.target_pos = self.current_card_pos
-        self.image_animation(surface)    # 애니메이션 (문제있음)
         self.position = self.target_pos
 
-=======
-    
-    # 카드 선택됐을 때 이미지 처리 (조금 위로 가게 함!)
-    def card_select(self, surface):
-        self.origin_pos = self.position # 현재 좌표를 origin 좌표에 대입
-        # target 좌표는 현재 좌표에서 y좌표만 변경
-        self.target_pos[0] = self.position[0]
-        self.target_pos[1] = self.position[1] + 10
-
-        # 애니메이션 효과
-        self.image_animation(surface)
-
->>>>>>> 567d3181f12ca04a4c9556af0ab21bee9df8f2b2
 
     # 색깔을 바꾼 경우 바꾼 색깔과 current_card 객체를 받아 카드 색깔을 바꿈
     def color_change(self, current_card, color):
         value1 = current_card.card_value[0]
         value2 = current_card.card_value[1]
         self.image = pygame.image.load(f"assets/images/cards/{value1}_{value2}_{color}.png")
-<<<<<<< HEAD
         self.card_load(self.position)
-=======
-        self.card_draw(self.position)
->>>>>>> 567d3181f12ca04a4c9556af0ab21bee9df8f2b2
+
 
     # deck (unopendeck)의 이미지 좌표 계산
     def deck_image_pos(self):
@@ -154,11 +139,11 @@ class PlayerState:
         self.player_card_num = 7    # 가지고 있는 카드의 개수
         self.player_cards_per_row = 10    # 한 줄당 카드의 개수
         self.player_spacing = 5
-        self.image = pygame.image.load("assets/images/cards/card_back_player.png")  
+        self.player_image = pygame.image.load("assets/images/cards/card_back_player.png")  
         self.player_name_font = pygame.font.Font(None, 30)
         self.player_name_text = self.player_name_font.render(self.player_name, True, (0, 0, 0))
         self.player_x_interval = self.player_bg.card_pos(self.player_bg.player_state_image.get_rect().size,
-                        self.player_spacing, self.image, self.player_cards_per_row) # player_board에서 카드끼리의 수평 간격
+                        self.player_spacing, self.player_image, self.player_cards_per_row) # player_board에서 카드끼리의 수평 간격
         self.player_y_interval = 20
         
 
@@ -183,7 +168,7 @@ class PlayerState:
             if (i % self.player_cards_per_row == 0)  & (i > 1):
                 card_draw_pos[0] = text_draw_pos[0]
                 card_draw_pos[1] += self.player_y_interval
-            surface.blit(self.image, (card_draw_pos[0] + (i % self.player_cards_per_row) * self.player_x_interval, card_draw_pos[1]))
+            surface.blit(self.player_image, (card_draw_pos[0] + (i % self.player_cards_per_row) * self.player_x_interval, card_draw_pos[1]))
 
     # 우노 상태일 때 우노 이미지 로드
 
@@ -269,25 +254,57 @@ def get_clicked_card(cards, x, y, spacing, mouse_x, mouse_y, max_per_row):
             return i, card
     return None, None
 
-
-def card_click(my_card_list, game_init, card_back, mouse_pos, surface):
-    # 카드를 받는 경우
-    if card_back.image_rect.collidepoint(mouse_pos):
-        print("카드를 받습니다.")
-        game_init.PlayedCard = 0
-        game_init.isCardPlayed = True
-    # 카드를 내는 경우
-    else :
-        # 겹치는 부분 중복 선택이 되지 않기 위해 가장 위쪽 카드 하나만 선택
-        for i in range (len(my_card_list)-1, -1, -1) :
-            if my_card_list[i].image_rect.collidepoint(mouse_pos):
-                if my_card_list[i].card_value in game_init.available:   # 낼 수 있는 카드일 경우
-                    print(str(my_card_list[i].card_value) + "카드 클릭")
-                    clicked_card = my_card_list[i]
-                    clicked_card.play_card_event(surface)   # 해당 카드 클릭 이벤트 실행
-                    game_init.PlayedCard = i + 1
-                    my_card_list.pop(i)     # 리스트에서 제외
-                    game_init.isCardPlayed = True
+# 카드 클릭
+def handle_click_card(event, game_init, surface):
+    if event.type == pygame.MOUSEBUTTONUP:
+        mouse_pos = pygame.mouse.get_pos()
+        # 카드를 받는 경우
+        if game_init.card_back_image.image_rect.collidepoint(mouse_pos):
+            print("카드를 받습니다.")
+            # unopendeck의 카드 객체 생성 후 my_card_list에 추가
+            game_init.my_card_list.append(CardLoad(game_init.unopenDeck.pop()))
+            game_init.my_card_list[len(game_init.my_card_list)-1].card_pop_image(game_init.my_card_list)
+            game_init.isCardPlayed = True
+            game_init.PlayedCard = 0
+        # 카드를 내는 경우
+        else :
+            # 겹치는 부분 중복 선택이 되지 않기 위해 가장 위쪽 카드 하나만 선택
+            for i in range (len(game_init.my_card_list)-1, -1, -1) :
+                if game_init.my_card_list[i].image_rect.collidepoint(mouse_pos):
+                    print(str(game_init.my_card_list[i].card_value) + "카드 클릭")
+                    for j in range(len(game_init.available)) :
+                        if game_init.my_card_list[i].card_value == game_init.available[j] : # 낼 수 있는 카드일 경우
+                            print("카드를 냅니다.")
+                            game_init.my_card_list[i].play_card_event()
+                            game_init.PlayedCard = j + 1
+                            game_init.isCardPlayed = True
+                            # 애니메이션이 끝나면 리스트에서 제외
+                            if game_init.my_card_list[i].origin_pos == game_init.my_card_list[i].target_pos :  
+                                game_init.my_card_list.pop(i)
+                                card_pos_change(game_init, surface)  # 뒷 카드 재정렬
+                                game_init.current_card_image = game_init.my_card_list[i]    # current card 이미지에 저장?
+                                game_init.is_ani_complete = True
+                            break
                     break
-                break
-        
+
+# 카드 냈을 때 낸 카드 다음부터 위치 재정렬
+def card_pos_change(game_init, surface):
+    for i in range(len(game_init.my_card_list)) :
+        value1 = i // game_init.my_card_list[i].cards_per_row
+        y_pos = game_init.my_card_list[i].spacing + value1 * game_init.my_card_list[i].y_interval + game_init.my_card_list[i].background.board_image_size()[1]
+        value2 = i % game_init.my_card_list[i].cards_per_row
+        x_pos = game_init.my_card_list[i].spacing + value2 * game_init.my_card_list[i].x_interval
+
+        game_init.my_card_list[i].position = [x_pos, y_pos]
+        game_init.my_card_list[i].image_rect.x = x_pos
+        game_init.my_card_list[i].image_rect.y = y_pos
+
+        surface.blit(game_init.my_card_list[i].image, game_init.my_card_list[i].position)
+
+    # game_init.my_card_list[i]
+    # for i in range (card_count):
+    #     if (i % game_init.my_card_list[i].cards_per_row == 0)  & (i > 1):
+    #         x_pos = game_init.my_card_list[i].spacing
+    #         y_pos += game_init.my_card_list[i].y_interval
+    #     surface.blit(game_init.my_card_list[i].image,
+    #         (card_draw_pos[0] + (i % game_init.my_card_list[i].cards_per_row) * game_init.my_card_list[i].x_interval, card_draw_pos[1]))
