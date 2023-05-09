@@ -2,12 +2,9 @@ import pygame
 import json
 import math
 
-<<<<<<< HEAD
 from game_class import *
 from game_logic import *
 
-=======
->>>>>>> 567d3181f12ca04a4c9556af0ab21bee9df8f2b2
 # 이미지 로드 및 애니메이션을 위한 Card 클래스
 class CardLoad:
     def __init__(self, card_value):
@@ -20,7 +17,6 @@ class CardLoad:
         self.deck_pos = self.deck_image_pos()    # 덱 좌표
         self.speed = 5  # 이동 속도
         self.spacing = 15   # myboard와 카드와의 간격
-<<<<<<< HEAD
         self.cards_per_row = 12  # myboard에서 한 줄당 카드의 수
         self.x_interval = self.background.card_pos(self.background.my_board_image.get_rect().size,
                         self.spacing, self.image, self.cards_per_row) # myboard에서 카드끼리의 수평 간격
@@ -38,7 +34,6 @@ class CardLoad:
 
     # 카드 이미지 로드
     def card_load(self, surface, pos):
-=======
         self.cards_per_row = 7  # myboard에서 한 줄당 카드의 수
         self.x_interval = self.background.card_pos(self.background.my_board_image.get_rect().size,
                         self.spacing, self.image, self.cards_per_row) # myboard에서 카드끼리의 수평 간격
@@ -50,7 +45,6 @@ class CardLoad:
 
     # 카드 이미지 로드
     def card_draw(self, surface, pos):
->>>>>>> 567d3181f12ca04a4c9556af0ab21bee9df8f2b2
         surface.blit(self.image, pos)
 
     
@@ -67,11 +61,8 @@ class CardLoad:
         x_pos = self.spacing + value2 * self.x_interval
 
         self.target_pos = [x_pos, y_pos]
-<<<<<<< HEAD
         self.position = self.target_pos     # 현재 좌표 설정
-=======
         self.position = self.target_pos
->>>>>>> 567d3181f12ca04a4c9556af0ab21bee9df8f2b2
     
 
     # 이미지 애니메이션
@@ -95,7 +86,6 @@ class CardLoad:
 
         surface.blit(self.image, self.image_rect)
 
-<<<<<<< HEAD
     # 카드 내는 함수
     def play_card_event(self, surface):
         self.origin_pos = self.position
@@ -103,7 +93,6 @@ class CardLoad:
         self.image_animation(surface)    # 애니메이션 (문제있음)
         self.position = self.target_pos
 
-=======
     
     # 카드 선택됐을 때 이미지 처리 (조금 위로 가게 함!)
     def card_select(self, surface):
@@ -115,18 +104,14 @@ class CardLoad:
         # 애니메이션 효과
         self.image_animation(surface)
 
->>>>>>> 567d3181f12ca04a4c9556af0ab21bee9df8f2b2
 
     # 색깔을 바꾼 경우 바꾼 색깔과 current_card 객체를 받아 카드 색깔을 바꿈
     def color_change(self, current_card, color):
         value1 = current_card.card_value[0]
         value2 = current_card.card_value[1]
         self.image = pygame.image.load(f"assets/images/cards/{value1}_{value2}_{color}.png")
-<<<<<<< HEAD
         self.card_load(self.position)
-=======
         self.card_draw(self.position)
->>>>>>> 567d3181f12ca04a4c9556af0ab21bee9df8f2b2
 
     # deck (unopendeck)의 이미지 좌표 계산
     def deck_image_pos(self):
