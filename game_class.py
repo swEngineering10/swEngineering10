@@ -13,11 +13,12 @@ class GameInit(object):
         self.available = []     # 가지고 있는 덱에서 낼 수 있는 카드 집합
 
         # 이미지 관련 변수
-        self.my_card_list = []  # 내 카드 이미지 리스트
-        self.card_back_image = object     # 카드덱
+        self.my_card_list = []              # 내 카드 이미지 리스트
+        self.card_back_image = object       # 카드덱
         self.current_card_image = object
+        self.open_deck_image_list = []           # 오픈덱 이미지 리스트
         self.is_ani_complete = False
-        self.player_deck_image = []     # 플레이어 이미지 객체 리스트
+        self.player_deck_image_list = []         # 플레이어 이미지 객체 리스트
 
         self.numPlayers = 0     #플레이어의 수
         self.playerTurn = 0     #현재 턴은 몇번째 턴?
