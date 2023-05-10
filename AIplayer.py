@@ -1,5 +1,7 @@
 from game_logic import *
 from common_function import ai_color_change
+from utility import CardLoad
+import pygame
 
 #ai 게임 진행 함수
 def ai_play_game(ob, cards):        
@@ -45,6 +47,15 @@ def ai_play_game(ob, cards):
             ai_special_card(ob, cards)
             print("\n")
             set_turn(ob)
+
+    # 완료되었을 때 남은 currentCard 이미지 변경
+    ob.current_card_image = CardLoad(ob.currentCard)
+
+    # 애니메이션
+    # ob.current_card_image.set_current_pos(ob.player_deck_image[0].player_pos)
+
+    # 완료되었을 때 남은 카드의 개수 저장 (0번째인 것 고쳐야 함)
+    ob.player_deck_image[0].player_card_num = len(ob.playerList[1])
     ob.turnCount += 1
 
 

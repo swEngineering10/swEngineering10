@@ -3,6 +3,7 @@ from random import randint
 import time
 
 from common_function import *
+from utility import handle_click_card
 
 # 덱의 가장 위 카드를 뽑아내는 함수
 def pop(cards): 
@@ -97,6 +98,7 @@ def print_information(ob, cards):
             ob.available.append(card)
     print("놓여진 카드: ", ob.currentCard)       #아래부터 나오는 print들은 다 디버그용
     print("낼 수 있는 카드: ", ob.available)
+    print("전체 갖고있는 카드", ob.playerList[ob.myTurn])
     
 #이전 카드가 Draw2카드일 때, 내기 전에 정보를 출력하는 함수
 def print_information_Draw2(ob, cards):
@@ -109,6 +111,7 @@ def print_information_Draw2(ob, cards):
             ob.available.append(card)
     print("놓여진 카드: ", ob.currentCard)       #아래부터 나오는 print들은 다 디버그용
     print("낼 수 있는 카드: ", ob.available)
+    print("전체 갖고있는 카드", ob.playerList[ob.myTurn])
 
 
 #카드를 한장 먹는 함수
@@ -134,57 +137,65 @@ def shuffle_card(ob):
 #플레이어 게임 진행 함수
 def play_game(ob, cards):       
     shuffle_card(ob)
-    print(ob.playerList[0]) # 내 카드 출력 (확인용)
+    
     if ob.Draw2Attack == False:     #Draw2 공격 상태가 아니라면
         print_information(ob, cards)
         
-        # a = int(input("몇번째 카드를 내겠습니까? (0: 카드먹기, 1: 첫번째 카드, 2: ...)"))
-        # 바꾸어야 하는 코드
-        while True :
-            if ob.isCardPlayed :
-                break
-        a = ob.PlayedCard
-        ob.isCardPlayed = False
+        if ob.isCardPlayed == True :
+
+            # a = int(input("몇번째 카드를 내겠습니까? (0: 카드먹기, 1: 첫번째 카드, 2: ...)"))
+            a = ob.PlayedCard
+            ob.isCardPlayed = False
+            
+            if a==0:        #카드 먹기
+                add_deck(ob, cards)
         
-        if a==0:        #카드 먹기
-            add_deck(ob, cards)
-    
-        else:       #카드 내기
-            ob.doubleWild = ob.currentCard[0]
-            ob.openDeck.append(ob.available[a-1])      # 오픈 덱에 낼 카드 저장
-            ob.currentCard = pop(ob.openDeck)        # 오픈 덱의 첫번째 카드 저장
-            print("내가 낸 카드: ", ob.currentCard)
-            cards.remove(ob.currentCard)            # 플레이어 카드덱에서 낸 카드는 삭제하기
-            is_repeatedcard(ob, cards)
-            special_card(ob, cards)
-            print("\n")
-            set_turn(ob)
+            else:       #카드 내기
+                ob.doubleWild = ob.currentCard[0]
+                ob.openDeck.append(ob.available[a-1])      # 오픈 덱에 낼 카드 저장
+                ob.currentCard = pop(ob.openDeck)        # 오픈 덱의 첫번째 카드 저장
+                print("내가 낸 카드: ", ob.currentCard)
+                cards.remove(ob.currentCard)            # 플레이어 카드덱에서 낸 카드는 삭제하기
+                is_repeatedcard(ob, cards)
+                special_card(ob, cards)
+                print("\n")
+                set_turn(ob)
+
+            ob.turnCount += 1
             
     elif ob.Draw2Attack == True:    #Draw2 공격 상태라면
         print_information_Draw2(ob, cards)
+
+        if ob.isCardPlayed == True :
         
-        # a = int(input("몇번째 카드를 내겠습니까? (0: 카드먹기, 1: 첫번째 카드, 2: ...)"))
-        
-        if a==0:
-            for i in range(0, ob.Draw2Count*2+1):
-                shuffle_card(ob)
-                ob.playerList[ob.playerTurn].append(ob.unopenDeck.pop())
-            print("방어 실패! ",ob.playerTurn,"번째 플레이어가", ob.Draw2Count * 2,"장을 먹습니다")
-            set_turn(ob)
-            ob.Draw2Attack = False
-            ob.Draw2Count = 0
-        else:
-            ob.doubleWild = ob.currentCard[0]
-            ob.openDeck.append(ob.available[a-1])      # 오픈 덱에 낼 카드 저장
-            ob.currentCard = pop(ob.openDeck)        # 오픈 덱의 첫번째 카드 저장
-            print(ob.playerTurn, "번째 플레이어가 낸 카드: ", ob.currentCard)
-                        
-            cards.remove(ob.currentCard)            # 플레이어 카드덱에서 낸 카드는 삭제하기
-            special_card(ob, cards)
+            # a = int(input("몇번째 카드를 내겠습니까? (0: 카드먹기, 1: 첫번째 카드, 2: ...)"))
+
+            a = ob.PlayedCard
+            ob.isCardPlayed = False
             
-            print("\n")
-            set_turn(ob)
-    ob.turnCount += 1
+            if a==0:
+                for i in range(0, ob.Draw2Count*2+1):
+                    shuffle_card(ob)
+                    ob.playerList[ob.playerTurn].append(ob.unopenDeck.pop())
+                print("방어 실패! ",ob.playerTurn,"번째 플레이어가", ob.Draw2Count * 2,"장을 먹습니다")
+                set_turn(ob)
+                ob.Draw2Attack = False
+                ob.Draw2Count = 0
+            else:
+                ob.doubleWild = ob.currentCard[0]
+                ob.openDeck.append(ob.available[a-1])      # 오픈 덱에 낼 카드 저장
+                ob.currentCard = pop(ob.openDeck)        # 오픈 덱의 첫번째 카드 저장
+                print(ob.playerTurn, "번째 플레이어가 낸 카드: ", ob.currentCard)
+                            
+                cards.remove(ob.currentCard)            # 플레이어 카드덱에서 낸 카드는 삭제하기
+                special_card(ob, cards)
+                
+                print("\n")
+                set_turn(ob)
+
+            ob.turnCount += 1
+
+    # current card 저장
 
 
 #중복 카드 검사

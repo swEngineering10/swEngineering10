@@ -15,6 +15,7 @@ from screens.abc_screen import Screen
 from screens.start_screen import StartScreen
 from screens.main_screen import MainScreen
 from screens.volume_screen import VolumeScreen
+from screens.lobby_screen import LobbyScreen
 
 from utilities.image_utility import load_image
 from utilities.text_utility import truncate
@@ -69,6 +70,7 @@ def terminate():
 
 
 def main():
+    print("실험")
     networking = Networking()  # SERVER_IP 인자 제외
 
     pygame.display.set_caption('PyUnoGame')
@@ -111,8 +113,7 @@ def main():
             if not current_screen.run(events):
                 manager.clear_and_reset()   # 이부분 위로 올림 (스크린 객체생성보다 아래로 가면 버튼 객체 지워버림)
                 # 현재 화면의 다음 화면을 가져옵니다.
-                current_screen = current_screen.next_screen(
-                    screen, manager, networking)
+                current_screen = current_screen.next_screen(screen, manager, networking)
 
         else:
             terminate()
