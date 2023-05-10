@@ -260,10 +260,9 @@ def handle_click_card(event, game_init, surface):
         mouse_pos = pygame.mouse.get_pos()
         # 카드를 받는 경우
         if game_init.card_back_image.image_rect.collidepoint(mouse_pos):
-            print("카드를 받습니다.")
             # unopendeck의 카드 객체 생성 후 my_card_list에 추가
-            game_init.my_card_list.append(CardLoad(game_init.unopenDeck.pop()))
-            game_init.my_card_list[len(game_init.my_card_list)-1].card_pop_image(game_init.my_card_list)
+            game_init.my_card_list.append(CardLoad(game_init.unopenDeck[-1]))
+            game_init.my_card_list[len(game_init.my_card_list)-1].card_pop_image(game_init.my_card_list)    # 좌표 설정
             game_init.isCardPlayed = True
             game_init.PlayedCard = 0
         # 카드를 내는 경우
@@ -274,17 +273,13 @@ def handle_click_card(event, game_init, surface):
                     print(str(game_init.my_card_list[i].card_value) + "카드 클릭")
                     for j in range(len(game_init.available)) :
                         if game_init.my_card_list[i].card_value == game_init.available[j] : # 낼 수 있는 카드일 경우
-                            print("카드를 냅니다.")
                             game_init.my_card_list[i].play_card_event()
                             game_init.PlayedCard = j + 1
                             game_init.isCardPlayed = True
-                            # 애니메이션이 끝나면 리스트에서 제외
-                            if game_init.my_card_list[i].origin_pos == game_init.my_card_list[i].target_pos :  
-                                game_init.my_card_list.pop(i)
-                                card_pos_change(game_init, surface)  # 뒷 카드 재정렬
-                                game_init.current_card_image = game_init.my_card_list[i]    # current card 이미지에 저장?
-                                game_init.is_ani_complete = True
-                            break
+                            game_init.open_deck_image_list.append(game_init.my_card_list.pop(i))
+                            game_init.current_card_image = game_init.open_deck_image_list[-1]    # current card 이미지에 저장
+                            card_pos_change(game_init, surface)  # 뒷 카드 재정렬
+                            break  
                     break
 
 # 카드 냈을 때 낸 카드 다음부터 위치 재정렬
@@ -300,11 +295,4 @@ def card_pos_change(game_init, surface):
         game_init.my_card_list[i].image_rect.y = y_pos
 
         surface.blit(game_init.my_card_list[i].image, game_init.my_card_list[i].position)
-
-    # game_init.my_card_list[i]
-    # for i in range (card_count):
-    #     if (i % game_init.my_card_list[i].cards_per_row == 0)  & (i > 1):
-    #         x_pos = game_init.my_card_list[i].spacing
-    #         y_pos += game_init.my_card_list[i].y_interval
-    #     surface.blit(game_init.my_card_list[i].image,
-    #         (card_draw_pos[0] + (i % game_init.my_card_list[i].cards_per_row) * game_init.my_card_list[i].x_interval, card_draw_pos[1]))
+        
