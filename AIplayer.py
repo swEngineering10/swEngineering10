@@ -49,13 +49,15 @@ def ai_play_game(ob, cards):
             set_turn(ob)
 
     # 완료되었을 때 남은 currentCard 이미지 변경
-    ob.current_card_image = CardLoad(ob.currentCard)
+    ob.open_deck_image_list.append(CardLoad(ob.currentCard))
+    ob.current_card_image = ob.open_deck_image_list[-1]
 
-    # 애니메이션
-    # ob.current_card_image.set_current_pos(ob.player_deck_image[0].player_pos)
+    # 애니메이션 (플레이어 번호에 맞추어 바꾸어야 함!!!!)
+    # ob.current_card_image.set_current_pos(ob.player_deck_image_list[0].player_pos) 이렇게 하면 오류 남
+    ob.current_card_image.set_current_pos([ob.player_deck_image_list[0].player_pos[0], ob.player_deck_image_list[0].player_pos[1]])
 
     # 완료되었을 때 남은 카드의 개수 저장 (0번째인 것 고쳐야 함)
-    ob.player_deck_image[0].player_card_num = len(ob.playerList[1])
+    ob.player_deck_image_list[0].player_card_num = len(ob.playerList[1])
     ob.turnCount += 1
 
 

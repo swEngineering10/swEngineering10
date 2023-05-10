@@ -50,7 +50,8 @@ class MainScreen(Screen):
         init(self.game_init)
 
         # currentCard 이미지 로드 객체 생성
-        self.game_init.current_card_image = CardLoad(self.game_init.currentCard)
+        self.game_init.open_deck_image_list.append(CardLoad(self.game_init.currentCard))
+        self.game_init.current_card_image = self.game_init.open_deck_image_list[0]
         
         # 유저 보유 카드 리스트 모두 CardLoad 객체 생성 후 이미지 로드
         split_cards(self.game_init)
@@ -61,7 +62,7 @@ class MainScreen(Screen):
 
         # computer player 이미지 객체 생성
         self.player1 = PlayerState(1)
-        self.game_init.player_deck_image.append(self.player1) # 0번째인 것 고쳐야 함
+        self.game_init.player_deck_image_list.append(self.player1) # 0번째인 것 고쳐야 함
 
     
     # 카드 덱
@@ -73,7 +74,8 @@ class MainScreen(Screen):
 
     # currendtCard 애니메이션
     def current_card_ani(self):
-        self.game_init.current_card_image.animation_control(self.screen)
+        for i in range(len(self.game_init.open_deck_image_list)):
+            self.game_init.open_deck_image_list[i].animation_control(self.screen)
 
     # 유저 플레이어 카드 로드
     def user_card_load(self):
@@ -82,8 +84,8 @@ class MainScreen(Screen):
     
     # 컴퓨터 플레이어 카드 로드
     def player_card_load(self):
-        for i in range(len(self.game_init.player_deck_image)) :
-            self.game_init.player_deck_image[i].player_state_draw(self.screen)
+        for i in range(len(self.game_init.player_deck_image_list)) :
+            self.game_init.player_deck_image_list[i].player_state_draw(self.screen)
 
 
     # 이벤트 처리 함수
@@ -102,7 +104,7 @@ class MainScreen(Screen):
         self.deck_image_load()
         self.user_card_load()
         self.player_card_load()
-        self.current_card_load()
+        self.current_card_ani()
 
 
         for event in events:
@@ -114,7 +116,6 @@ class MainScreen(Screen):
             play_game(self.game_init, self.game_init.playerList[self.game_init.playerTurn])
         else:
             ai_play_game(self.game_init, self.game_init.playerList[self.game_init.playerTurn])
-
 
 
         if self.networking.current_game.is_started:
