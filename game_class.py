@@ -2,14 +2,23 @@
 
 import pygame
 
+
 class GameInit(object):
     def __init__(self):
-        self.playerList = [[], [], [], [], [], [], []]          # 모든 플레이어의 보유 카드 정보 (최대 7명)
+        self.playerList = [[], [], [], [], [], []]          # 모든 플레이어의 보유 카드 정보 (최대 6명)
         self.unopenDeck = list()                                # 카드 더미
         self.openDeck = list()                                  # 오픈된 카드 더미
         self.currentCard = tuple()                              # openDeck의 가장 위 카드
         self.cardColor = ['Blue', 'Red', 'Green', 'Yellow']     # 카드 색깔 종류
-        self.available = []     #가지고 있는 덱에서 낼 수 있는 카드 집합
+        self.available = []     # 가지고 있는 덱에서 낼 수 있는 카드 집합
+
+        # 이미지 관련 변수
+        self.my_card_list = []              # 내 카드 이미지 리스트
+        self.card_back_image = object       # 카드덱
+        self.current_card_image = object
+        self.open_deck_image_list = []           # 오픈덱 이미지 리스트
+        self.is_ani_complete = False
+        self.player_deck_image_list = []         # 플레이어 이미지 객체 리스트
 
         self.numPlayers = 0     #플레이어의 수
         self.playerTurn = 0     #현재 턴은 몇번째 턴?
