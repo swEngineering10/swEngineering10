@@ -32,6 +32,19 @@ class GameInit(object):
         self.isCardDrawn = False        # 카드 뽑았는지 여부
         self.isCardPlayed = False       # 카드 냈는지 여부
         self.PlayedCard = 0             # 몇 번째 카드를 냈는가?
+        self.isUnChecked = True        # 다음 코드를 확인하였는가? (한 번만 실행되어야 하는 코드)
+
+        # 콘솔 출력용
+        self.A = True
+
+        # 테스트
+        self.delay = 0
+
+        self.currentPopup = None
+        self.selectedColor = None       # 어떤 색깔을 선택하였는가?
+        self.isColorChanged = False     # 색깔 선택을 해서 바뀌었는가? (이미지 로드용)
+        self.IsChallenge = None         # 챌린지를 했는가? (0 : 챌린지, 1 : 포기)
+
         self.Draw2Attack = False        # Draw2 공격이 진행중인가?
         self.Draw2Count = 0             # Draw2 공격이 몇번 중첩되었는가?
         self.turnCount = 1              # 게임이 시작된 이래로 몇번씩 주고받았는가?

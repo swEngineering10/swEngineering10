@@ -1,13 +1,18 @@
 from game_logic import *
-from common_function import ai_color_change
+from common_function import *
 from utility import CardLoad
 import pygame
 
 #ai 게임 진행 함수
 def ai_play_game(ob, cards):        
     shuffle_card(ob)
+
+    # 현재 플레이어 인덱스 저장
+    pre_player = ob.playerTurn
+
     if ob.Draw2Attack == False:     #Draw2 공격 상태가 아니라면
         print_information(ob, cards)
+        info(ob)
         if len(ob.available)==0:        # 카드 먹기
             add_deck(ob, cards)
     
@@ -27,13 +32,16 @@ def ai_play_game(ob, cards):
             else:       #A지역이 아니라면
                 stupid_ai(ob, cards)
 
+
     elif ob.Draw2Attack == True:    #Draw2 공격 상태라면
         print_information_Draw2(ob, cards)
+        info(ob)
         if len(ob.available)==0:
             for i in range(0, ob.Draw2Count*2+1):
                 shuffle_card(ob)
                 ob.playerList[ob.playerTurn].append(ob.unopenDeck.pop())
             print("방어 실패! ",ob.playerTurn,"번째 플레이어가", ob.Draw2Count * 2,"장을 먹습니다")
+
             set_turn(ob)
             ob.Draw2Attack = False
             ob.Draw2Count = 0
@@ -46,18 +54,16 @@ def ai_play_game(ob, cards):
             cards.remove(ob.currentCard)            # 플레이어 카드덱에서 낸 카드는 삭제하기
             ai_special_card(ob, cards)
             print("\n")
+
             set_turn(ob)
 
     # 완료되었을 때 남은 currentCard 이미지 변경
     ob.open_deck_image_list.append(CardLoad(ob.currentCard))
     ob.current_card_image = ob.open_deck_image_list[-1]
 
-    # 애니메이션 (플레이어 번호에 맞추어 바꾸어야 함!!!!)
-    # ob.current_card_image.set_current_pos(ob.player_deck_image_list[0].player_pos) 이렇게 하면 오류 남
-    ob.current_card_image.set_current_pos([ob.player_deck_image_list[0].player_pos[0], ob.player_deck_image_list[0].player_pos[1]])
+    # 컴퓨터 플레이어가 카드 낼 때 애니메이션
+    ob.current_card_image.set_current_pos([ob.player_deck_image_list[pre_player - 1].player_pos[0], ob.player_deck_image_list[pre_player - 1].player_pos[1]])
 
-    # 완료되었을 때 남은 카드의 개수 저장 (0번째인 것 고쳐야 함)
-    ob.player_deck_image_list[0].player_card_num = len(ob.playerList[1])
     ob.turnCount += 1
 
 
@@ -71,32 +77,47 @@ def ai_special_card(ob, cards):
             if ob.currentCard[1] == "Swap":
                 print("몇번째 플레이어와 카드를 바꾸겠습니까?")
                 swapedPlayer= randint(0, ob.numPlayers-1)
+                print(swapedPlayer, "번째 플레이어와 카드를 바꿉니다.")
                 ob.playerList[ob.playerTurn], ob.playerList[swapedPlayer] = ob.playerList[swapedPlayer], ob.playerList[ob.playerTurn]
                 ai_color_change(ob)
         
+        # AI가 Draw4를 냈을 때
         if ob.currentCard[1] == "Draw4":
             print(ob.playerList[ob.playerTurn])
-            #challenge = 1          #디버그용
-            
-            next_turn(ob)
+
+            # 아래는 한번만 처리되어야 하는 코드
+            if ob.isUnChecked :
+                next_turn(ob)
+                ob.isUnChecked = False
 
             if ob.nextTurn != ob.myTurn:      #다음턴이 ai면
                 challenge = randint(0, 1)       #ai가 공격할 것인가?
+
             elif ob.nextTurn == ob.myTurn:    #다음턴이 내차례라면
-                challenge = int(input("공격하시겠습니까?(0: 공격하지 않음, 1: 공격함)"))
+
+                ob.currentPopup = "challenge"   # 챌린지 여부 팝업 띄우기 (입력 받기)
+                # 버튼 눌렀을 때만 아래 코드 실행
+                if ob.IsChallenge != None :
+                    challenge = ob.IsChallenge # 0: 공격하지 않음, 1: 공격함
                 
-            if challenge==1:        #공격시
-                Draw4(ob, cards)
-            else:       #도전 자체를 하지 않는다면?
-                print("다음턴인 ", ob.nextTurn, "이 4장을 먹습니다!")
-                for i in range(0, 4):
-                    shuffle_card(ob)
-                    ob.playerList[ob.nextTurn].append(ob.unopenDeck.pop())        #다음턴이 4장 먹음
+                    if challenge==1:        #공격시
+                        Draw4(ob, cards)
                         
-            ai_color_change(ob)        
-            ob.playerTurn += ob.playDirection 
-            over_turn(ob)
-            #ob.playerTurn += ob.playDirection * 2
+                    else:       #도전 자체를 하지 않는다면?
+                        print("다음턴인 ", ob.nextTurn, "이 4장을 먹습니다!")
+                        for i in range(0, 4):
+                            shuffle_card(ob)
+                            popCard = ob.unopenDeck.pop()
+                            ob.playerList[ob.nextTurn].append(popCard)        # 다음턴이 4장 먹음
+                            ob.my_card_list.append(CardLoad(popCard))         # 카드 이미지 저장
+                                
+                    ai_color_change(ob)        
+                    ob.playerTurn += ob.playDirection 
+                    ob.currentPopup = None
+                    ob.IsChallenge = None
+                    ob.isUnChecked = True
+                    over_turn(ob)
+                    #ob.playerTurn += ob.playDirection * 2
             
     if ob.currentCard[1] == "Draw2":        #다음턴이 두장먹기
         Draw2(ob, cards)
@@ -109,8 +130,18 @@ def ai_special_card(ob, cards):
 def ai_color_change(ob):    
     print("바꿀 색깔을 1. Blue 2. Red 3.Green 4. Yellow중에서 무작위로 고릅니다.")
     newColour = randint(1, 4)
-    ob.currentCard = (ob.cardColor[newColour-1], " ")
+    if ob.currentCard[1] == "Color_Change" :
+        ob.currentCard = (ob.cardColor[newColour-1], "Color_Change")
+        ob.current_card_image = CardLoad((ob.cardColor[newColour-1], "Color_Change"))
+    elif ob.currentCard[1] == "Draw4" :
+        ob.currentCard = (ob.cardColor[newColour-1], "Draw4")
+        ob.current_card_image = CardLoad((ob.cardColor[newColour-1], "Draw4"))         
+    elif ob.currentCard[1] == "Swap" : 
+        ob.currentCard = (ob.cardColor[newColour-1], "Swap")
+        ob.current_card_image = CardLoad((ob.cardColor[newColour-1], "Swap"))
     print(ob.cardColor[newColour-1],"라는 색깔을 선택합니다!")
+    ob.playerTurn += ob.playDirection
+    over_turn(ob)
 
 
 def stupid_ai(ob, cards):
@@ -122,4 +153,5 @@ def stupid_ai(ob, cards):
     is_repeatedcard(ob, cards)
     ai_special_card(ob, cards)
     print("\n")
+
     set_turn(ob)

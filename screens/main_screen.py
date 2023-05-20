@@ -20,8 +20,11 @@ from utility import resolution
 from utility import PlayerState
 from utility import BackGround
 from utility import handle_click_card
-from game_class import GameInit
 from utility import CardLoad
+from button import SelectColorPopup
+from button import IsChanllengePopup
+from button import InfoPopup
+from game_class import GameInit
 from client.networking import Networking
 from screens.abc_screen import Screen
 
@@ -41,7 +44,7 @@ class MainScreen(Screen):
         
         # 게임 객체 생성
         self.game_init = GameInit()
-        self.game_init.numPlayers = 2  # 플레이어의 수 2라고 가정 (나중에 로비에서 값 받아야 함!!)
+        self.game_init.numPlayers = 5  # 유저 포함 플레이어의 수 가정 (나중에 로비에서 값 받아야 함!!)
 
         # 카드 덱 (미오픈) 이미지 로드
         self.game_init.card_back_image = CardLoad(("card", "back"))
@@ -55,14 +58,25 @@ class MainScreen(Screen):
         
         # 유저 보유 카드 리스트 모두 CardLoad 객체 생성 후 이미지 로드
         split_cards(self.game_init)
-
         for i in range(len(self.game_init.playerList[self.game_init.myTurn])) :
             self.game_init.my_card_list.append(CardLoad(self.game_init.playerList[self.game_init.myTurn][i]))
             self.game_init.my_card_list[i].card_pop_image(self.game_init.my_card_list)
 
-        # computer player 이미지 객체 생성
-        self.player1 = PlayerState(1)
-        self.game_init.player_deck_image_list.append(self.player1) # 0번째인 것 고쳐야 함
+        # computer player 이미지 객체 생성 (1 ~ numPlayers-1)
+        for i in range(1, self.game_init.numPlayers) :
+            self.game_init.player_deck_image_list.append(PlayerState(i))
+
+        # 카드 선택 팝업 관련
+        self.color_popup = SelectColorPopup()
+        self.color_button_list = [self.color_popup.blue_button, self.color_popup.red_button, self.color_popup.green_button, self.color_popup.yellow_button]
+
+        # 챌린지 여부 선택 팝업 관련
+        self.challenge_popup = IsChanllengePopup()
+        self.challenge_button_list = [self.challenge_popup.challenge_button, self.challenge_popup.giveup_button]
+
+        # 게임 진행 정보 팝업 관련
+        self.fail_challenge = InfoPopup("도전에 실패했습니다! 다음 플레이어가 4장을 받습니다.")
+
 
     
     # 카드 덱
@@ -87,13 +101,6 @@ class MainScreen(Screen):
         for i in range(len(self.game_init.player_deck_image_list)) :
             self.game_init.player_deck_image_list[i].player_state_draw(self.screen)
 
-
-    # 이벤트 처리 함수
-    def handle_event(self, event):
-        if event.type == pygame_gui.UI_BUTTON_PRESSED:
-            pass
-
-
     # run 함수
     def run(self, events: list[Event]) -> bool:
 
@@ -105,17 +112,42 @@ class MainScreen(Screen):
         self.user_card_load()
         self.player_card_load()
         self.current_card_ani()
+        if self.game_init.isColorChanged :
+            self.game_init.current_card_image.card_load(self.screen, self.game_init.current_card_image[-1].current_card_pos)
 
 
         for event in events:
-            # 이벤트 처리
-            handle_click_card(event, self.game_init, self.screen)
+            # 내 차례일 때만 카드 클릭할 수 있도록 하기
+            if self.game_init.playerTurn == self.game_init.myTurn :
+                handle_click_card(event, self.game_init, self.screen)
+
+            if self.game_init.currentPopup == "color_change":
+                for color_button in self.color_button_list:
+                    color_button.handle_event(event, self.game_init, self.screen)
+            
+            elif self.game_init.currentPopup == "challenge":
+                for challenge_button in self.challenge_button_list:
+                    challenge_button.handle_event(event, self.game_init, self.screen)
+
 
         # 게임 실행
         if self.game_init.myTurn == self.game_init.playerTurn :
             play_game(self.game_init, self.game_init.playerList[self.game_init.playerTurn])
+            self.game_init.delay = 0
         else:
-            ai_play_game(self.game_init, self.game_init.playerList[self.game_init.playerTurn])
+            # 컴퓨터 플레이어 딜레이 주기
+            if self.game_init.delay == 200 :
+                ai_play_game(self.game_init, self.game_init.playerList[self.game_init.playerTurn])
+                self.game_init.delay = 0
+
+        self.game_init.delay += 1
+
+        
+        # 게임 진행 관련 로드
+        if self.game_init.currentPopup == "color_change" :
+            self.color_popup.popup_draw(self.screen)
+        elif self.game_init.currentPopup == "challenge" :
+            self.challenge_popup.popup_draw(self.screen)
 
 
         if self.networking.current_game.is_started:

@@ -70,7 +70,6 @@ def terminate():
 
 
 def main():
-    print("실험")
     networking = Networking()  # SERVER_IP 인자 제외
 
     pygame.display.set_caption('PyUnoGame')
