@@ -16,6 +16,8 @@ from screens.start_screen import StartScreen
 from screens.main_screen import MainScreen
 from screens.volume_screen import VolumeScreen
 from screens.lobby_screen import LobbyScreen
+from screens.achievement_screen import Achievement
+
 
 from utilities.image_utility import load_image
 from utilities.text_utility import truncate
@@ -79,7 +81,7 @@ def main():
     fps = 120
     clock = pygame.time.Clock()
 
-    current_screen = MainScreen(screen, manager, networking)
+    current_screen = Achievement(screen, manager, networking)
 
     # 인증 부분
     '''

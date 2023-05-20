@@ -14,6 +14,10 @@ from game_logic import init
 from game_logic import split_cards
 from game_logic import play_game
 from game_logic import game_end
+from game_logic import load_achievements
+from game_logic import save_achievements
+from game_logic import update_achievement
+
 from AIplayer import ai_play_game
 from utility import resolution
 
@@ -24,6 +28,10 @@ from game_class import GameInit
 from utility import CardLoad
 from client.networking import Networking
 from screens.abc_screen import Screen
+
+from setting_class import *
+
+ess = Setting()
 
 class MainScreen(Screen):
     def __init__(self, surface: Surface, manager: pygame_gui.UIManager, networking: Networking):
@@ -110,6 +118,15 @@ class MainScreen(Screen):
         for event in events:
             # 이벤트 처리
             handle_click_card(event, self.game_init, self.screen)
+
+        #업적 로드
+        load_achievements()
+
+        #업적 달성시
+        ''' if
+            update_achievement("업적이름")
+            save_achievements()
+        ''' 
 
         # 게임 실행
         if self.game_init.myTurn == self.game_init.playerTurn :
