@@ -16,7 +16,7 @@ class CardLoad:
         self.background = BackGround()  # BackGround 객체 생성
         self.current_card_pos = self.opendeck_image_pos()  # currentCard(오픈 카드)일 때 이미지 위치
         self.deck_pos = self.deck_image_pos()    # 덱 좌표
-        self.speed = 10  # 이동 속도
+        self.speed = 7  # 이동 속도
         self.spacing = 15   # myboard와 카드와의 간격
         self.cards_per_row = 12  # myboard에서 한 줄당 카드의 수
         self.x_interval = self.background.card_pos(self.background.my_board_image.get_rect().size,
@@ -33,14 +33,33 @@ class CardLoad:
         if self.card_value == ("card", "back") :
             self.image_rect.x, self.image_rect.y = self.deck_pos
 
+    # 컴퓨터가 카드 낼 때 함수
     def set_current_pos(self, player_pos) :
         self.origin_pos = player_pos
         self.target_pos = self.current_card_pos
 
+    # 컴퓨터가 카드 받을 때 함수
+    def set_player_pos(self, player_pos) :
+        self.origin_pos = self.deck_pos
+        self.target_pos = player_pos
 
     # 카드 이미지 로드
     def card_load(self, surface, pos):
         surface.blit(self.image, pos)
+
+    # 카드가 선택되었을 때
+    def card_select(self, is_hovered):
+        origin_pos1 = self.position
+        target_pos1 = [self.position[0], self.position[1] - 5]
+        origin_pos2 = [self.position[0], self.position[1] - 5]
+        target_pos2 = self.position
+
+        if is_hovered == True :
+            self.origin_pos = origin_pos1
+            self.target_pos = target_pos1
+        elif is_hovered == False :
+            self.origin_pos = origin_pos2
+            self.target_pos = target_pos2
 
     
     # 카드 받을 때 좌표
@@ -93,7 +112,6 @@ class CardLoad:
     def animation_control(self, surface) :
         if not self.origin_pos == self.target_pos :
             self.image_animation(surface)
-            pygame.display.flip()
         else :
             self.card_load(surface, self.position)
 
@@ -103,14 +121,6 @@ class CardLoad:
         self.origin_pos = self.position
         self.target_pos = self.current_card_pos
         self.position = self.target_pos
-
-
-    # 색깔을 바꾼 경우 바꾼 색깔과 current_card 객체를 받아 카드 색깔을 바꿈
-    def color_change(self, current_card, color):
-        value1 = current_card.card_value[0]
-        value2 = current_card.card_value[1]
-        self.image = pygame.image.load(f"assets/images/cards/{value1}_{value2}_{color}.png")
-        self.card_load(self.position)
 
 
     # deck (unopendeck)의 이미지 좌표 계산
@@ -134,13 +144,14 @@ class PlayerState:
     def __init__(self, player_num):
         self.player_bg = BackGround()
         self.player_num = player_num
-        self.player_name = "Computer " + str(player_num)
+        self.player_name = "컴퓨터 " + str(player_num)
         self.player_pos = self.player_pos_change()
         self.player_card_num = 7    # 가지고 있는 카드의 개수
         self.player_cards_per_row = 10    # 한 줄당 카드의 개수
         self.player_spacing = 5
         self.player_image = pygame.image.load("assets/images/cards/card_back_player.png")  
-        self.player_name_font = pygame.font.Font(None, 30)
+        self.font_path = "assets/fonts/NanumSquare_acB.ttf"
+        self.player_name_font = pygame.font.Font(self.font_path, 17)
         self.player_name_text = self.player_name_font.render(self.player_name, True, (0, 0, 0))
         self.player_x_interval = self.player_bg.card_pos(self.player_bg.player_state_image.get_rect().size,
                         self.player_spacing, self.player_image, self.player_cards_per_row) # player_board에서 카드끼리의 수평 간격
@@ -154,7 +165,7 @@ class PlayerState:
         interval = self.player_bg.player_state_image.get_rect().height + self.player_bg.state_spacing
         return [x, y + (self.player_num - 1) * interval]
 
-    # 플레이어 상태 이미지 로드 (애니메이션 없다고 가정,,,)
+    # 플레이어 상태 이미지 로드
     def player_state_draw(self, surface):
         # 플레이어 이름 로드
         text_draw_pos = [self.player_pos[0] + self.player_spacing, self.player_pos[1] + self.player_spacing]
@@ -231,33 +242,24 @@ def resolution():
 
 
 
-'''
-def exit_button(self):
-    self.mixer.music.stop()
-    print('종료 버튼을 눌러 게임이 종료되었습니다!')
-    self.running = False
-
-def draw(self):
-    self.screen.blit(pygame.image.load(r"assets/images/cards/UNO_Button.png"), self.uno_button.get_rect())
-'''
-    
-# 카드 클릭 이벤트
-############# 바꿔야함!!!!!!!! ################
-def get_clicked_card(cards, x, y, spacing, mouse_x, mouse_y, max_per_row):
-    for i, card in enumerate(cards):
-        card_width, card_height = card.card_img.get_size()
-        row = i // max_per_row
-        column = i % max_per_row
-        card_x = x + column * spacing
-        card_y = y + row * (spacing + 10)  # 각 행의 시작 y 좌표를 고려하도록 수정
-        if card_x <= mouse_x < card_x + card_width and card_y <= mouse_y < card_y + card_height:
-            return i, card
-    return None, None
-
 # 카드 클릭
 def handle_click_card(event, game_init, surface):
+
+    # 카드에 커서를 올렸을 때
+    if event.type == pygame.MOUSEMOTION:
+        mouse_pos = pygame.mouse.get_pos()
+        # for i in range(len(game_init.my_card_list)) :
+        #     if game_init.my_card_list[i].image_rect.collidepoint(mouse_pos):
+        #         game_init.is_hovered = True
+        #         game_init.my_card_list[i].card_select(game_init.is_hovered)
+        #     else :
+        #         game_init.is_hovered = False
+        #         game_init.my_card_list[i].card_select(game_init.is_hovered)
+                
+    # 카드를 눌렀을 때
     if event.type == pygame.MOUSEBUTTONUP:
         mouse_pos = pygame.mouse.get_pos()
+
         # 카드를 받는 경우
         if game_init.card_back_image.image_rect.collidepoint(mouse_pos):
             # unopendeck의 카드 객체 생성 후 my_card_list에 추가
@@ -265,6 +267,7 @@ def handle_click_card(event, game_init, surface):
             game_init.my_card_list[len(game_init.my_card_list)-1].card_pop_image(game_init.my_card_list)    # 좌표 설정
             game_init.isCardPlayed = True
             game_init.PlayedCard = 0
+
         # 카드를 내는 경우
         else :
             # 겹치는 부분 중복 선택이 되지 않기 위해 가장 위쪽 카드 하나만 선택
