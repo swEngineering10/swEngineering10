@@ -79,6 +79,18 @@ def ai_special_card(ob, cards):
                 swapedPlayer= randint(0, ob.numPlayers-1)
                 print(swapedPlayer, "번째 플레이어와 카드를 바꿉니다.")
                 ob.playerList[ob.playerTurn], ob.playerList[swapedPlayer] = ob.playerList[swapedPlayer], ob.playerList[ob.playerTurn]
+                
+                # 내 이미지 갱신 (유저 함수에서 떼온 것)
+                # 카드의 origin_pos를 스왑 플레이어로 설정
+                x = ob.player_deck_image_list[swapedPlayer - 1].player_pos[0]
+                y = ob.player_deck_image_list[swapedPlayer - 1].player_pos[1]
+                pos = [x, y]
+                
+                # 카드 리스트 초기화
+                ob.my_card_list = []
+                for i in range(len(ob.playerList[ob.playerTurn])) :
+                    ob.my_card_list.append(CardLoad(ob.playerList[ob.playerTurn][i]))
+                    ob.my_card_list[i].swap_card_pop_image(ob.my_card_list)
                 ai_color_change(ob)
         
         # AI가 Draw4를 냈을 때
