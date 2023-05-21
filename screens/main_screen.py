@@ -16,16 +16,20 @@ from game_logic import play_game
 from game_logic import game_end
 from AIplayer import ai_play_game
 from utility import resolution
+from utility import handle_click_card
 
 from utility import PlayerState
 from utility import BackGround
-from utility import handle_click_card
 from utility import CardLoad
+
 from button import SelectColorPopup
 from button import IsChanllengePopup
 from button import IsSwapPopup
 from button import SelectSwapPopup
 from button import InfoPopup
+from button import SettingButton
+from button import SettingPopup
+
 from game_class import GameInit
 from client.networking import Networking
 from screens.abc_screen import Screen
@@ -68,18 +72,23 @@ class MainScreen(Screen):
         for i in range(1, self.game_init.numPlayers) :
             self.game_init.player_deck_image_list.append(PlayerState(i))
 
+        # 설정 버튼 & 설정 팝업
+        self.setting_button = SettingButton()
+        self.setting_popup = SettingPopup()
+        self.setting_popup_button_list = [self.setting_popup.setting_button, self.setting_popup.start_button, self.setting_popup.continue_button, self.setting_popup.exit_button]
+        
+
+        # 아래는 모두 팝업 관련 객체 생성 #
+
         # 카드 선택 팝업 관련
         self.color_popup = SelectColorPopup()
         self.color_button_list = [self.color_popup.blue_button, self.color_popup.red_button, self.color_popup.green_button, self.color_popup.yellow_button]
-
         # 챌린지 여부 선택 팝업 관련
         self.challenge_popup = IsChanllengePopup()
         self.challenge_button_list = [self.challenge_popup.challenge_button, self.challenge_popup.giveup_button]
-
         # 스왑 여부 선택 팝업 관련
         self.swap_popup = IsSwapPopup()
         self.swap_popup_button_list = [self.swap_popup.swap_button, self.swap_popup.not_swap_button]
-
         # 스왑 선택 팝업 관련
         self.select_swap_popup = SelectSwapPopup(self.game_init)
         self.select_swap_button_list = self.select_swap_popup.swap_button_list
@@ -127,12 +136,21 @@ class MainScreen(Screen):
         self.player_card_load()
         self.current_card_ani()
 
+        # 설정 버튼 로드
+        self.setting_button.draw(self.screen)
+
 
         for event in events:
             # 내 차례일 때만 카드 클릭할 수 있도록 하기
             if self.game_init.playerTurn == self.game_init.myTurn :
                 handle_click_card(event, self.game_init, self.screen)
 
+            self.setting_button.handle_event(event, self.game_init, self.screen)
+            if self.game_init.isPaused :
+                for setting_popup_button in self.setting_popup_button_list:
+                    setting_popup_button.handle_event(event, self.game_init, self.screen)
+
+            # 아래는 팝업 이벤트
             if self.game_init.currentPopup == "color_change":
                 for color_button in self.color_button_list:
                     color_button.handle_event(event, self.game_init, self.screen)
@@ -151,15 +169,16 @@ class MainScreen(Screen):
 
 
         # 게임 실행
-        if self.game_init.myTurn == self.game_init.playerTurn :
-            if self.game_init.delay == 200 :
-                play_game(self.game_init, self.game_init.playerList[self.game_init.playerTurn])
-                self.game_init.delay = 0
-        else:
-            # 컴퓨터 플레이어 딜레이 주기
-            if self.game_init.delay == 200 :
-                ai_play_game(self.game_init, self.game_init.playerList[self.game_init.playerTurn])
-                self.game_init.delay = 0
+        if self.game_init.isPaused == False :
+            if self.game_init.myTurn == self.game_init.playerTurn :
+                if self.game_init.delay == 100 :
+                    play_game(self.game_init, self.game_init.playerList[self.game_init.playerTurn])
+                    self.game_init.delay = 0
+            else:
+                # 컴퓨터 플레이어 딜레이 주기
+                if self.game_init.delay == 300 :
+                    ai_play_game(self.game_init, self.game_init.playerList[self.game_init.playerTurn])
+                    self.game_init.delay = 0
 
 
         # 이미지 새로 세팅 후 팝업창 띄우기
@@ -180,10 +199,15 @@ class MainScreen(Screen):
 
             self.game_init.isAIPlayed = False
 
-        self.game_init.delay += 1
+        # 게임 중단이 아닌 경우에만 delay 증가
+        if self.game_init.isPaused == False :
+            self.game_init.delay += 1
 
         
-        # 게임 진행 관련 로드
+        # 팝업 로드
+        if self.game_init.isPaused :    # 설정
+            self.setting_popup.popup_draw(self.screen)
+
         if self.game_init.currentPopup == "color_change" :
             self.color_popup.popup_draw(self.screen)
         elif self.game_init.currentPopup == "challenge" :
@@ -192,6 +216,7 @@ class MainScreen(Screen):
             self.swap_popup.popup_draw(self.screen)
         elif self.game_init.currentPopup == "select_swap" :
             self.select_swap_popup.popup_draw(self.screen)
+        
         
         # 알림창 로드
         if self.game_init.alertType != None :

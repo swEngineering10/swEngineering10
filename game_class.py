@@ -43,8 +43,8 @@ class GameInit(object):
         # 콘솔 출력용
         self.A = 0
 
-        # 테스트
         self.delay = 0
+        self.isPaused = False           # 게임 중단 (세팅 버튼)
 
         self.currentPopup = None
         self.selectedColor = None       # 어떤 색깔을 선택하였는가?

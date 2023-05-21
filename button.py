@@ -18,20 +18,71 @@ class ImageButton():
         self.image_rect.x = self.x
         self.image_rect.y = self.y
 
-
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONUP:
             mouse_pos = pygame.mouse.get_pos()
             if self.rect.collidepoint(mouse_pos):
                 self.on_click()
-
     
     def on_click(self):
         print("클릭!!")
 
-
     def draw(self, surface):
         surface.blit(self.image, self.image_rect)
+
+
+# 설정 버튼
+class SettingButton():
+    def __init__(self) :
+        self.x = 5
+        self.y = 5
+        self.image = pygame.image.load("assets/images/etc_game_image/setting.png")
+        self.image_width = self.image.get_rect().width
+        self.image_height = self.image.get_rect().height
+        self.hovered_image = pygame.image.load("assets/images/etc_game_image/setting_active.png")
+        self.hovered_image_width = self.hovered_image.get_rect().width
+        self.hovered_image_height = self.hovered_image.get_rect().height        
+        self.image_rect = pygame.Rect(self.x, self.y, self.image_width, self.image_height)
+        self.new_x = self.x - (self.hovered_image_width - self.image_width) // 2
+        self.new_y = self.y - (self.hovered_image_height - self.image_height) // 2
+        self.blit_image = self.image
+
+    def handle_event(self, event, game_init, surface):
+        if event.type == pygame.MOUSEBUTTONUP:
+            mouse_pos = pygame.mouse.get_pos()
+            if self.image_rect.collidepoint(mouse_pos):
+                self.on_click(game_init)
+
+        elif event.type == pygame.KEYUP:
+            if event.key == pygame.K_ESCAPE:
+                self.on_click(game_init)
+
+        elif event.type == pygame.MOUSEMOTION:
+            mouse_pos = pygame.mouse.get_pos()
+            if self.image_rect.collidepoint(mouse_pos):
+                self.on_hover(surface)
+            else:
+                self.on_hover_exit(surface)
+
+    # 설정 버튼 눌렀을 때 이벤트
+    def on_click(self, game_init):
+        if game_init.isPaused == False :
+            game_init.isPaused = True       # 게임 중단
+        else :
+            game_init.isPaused = False
+
+    def on_hover(self, surface):
+        self.image_rect = pygame.Rect(self.new_x, self.new_y, self.hovered_image_width, self.hovered_image_height)
+        self.blit_image = self.hovered_image
+        self.draw(surface)
+
+    def on_hover_exit(self, surface):
+        self.blit_image = self.image
+        self.image_rect = pygame.Rect(self.x, self.y, self.image_width, self.image_height)
+        self.draw(surface)
+
+    def draw(self, surface):
+        surface.blit(self.blit_image, self.image_rect)
 
 
 # 색깔 선택 팝업창을 위한 색깔 이미지 버튼
@@ -119,15 +170,28 @@ class PopupTextButton():
 
     # 버튼 클릭 이벤트
     def on_click(self, game_init):
+        # 챌린지 팝업 버튼
         if self.text == "챌린지" :
             game_init.IsChallenge = 0
         elif self.text == "포기" :
             game_init.IsChallenge = 1
 
+        # 스왑 팝업 버튼
         elif self.text == "스왑" :
             game_init.IsSwap = True
         elif self.text == "스왑하지 않기" :
             game_init.IsSwap = False
+
+        # 설정 팝업 버튼
+        elif self.text == "설정" :
+            pass
+        elif self.text == "처음 화면으로" :
+            pass
+        elif self.text == "계속하기" :
+            game_init.isPaused = False
+        elif self.text == "종료하기" :
+            pygame.quit()
+            quit()
 
 
     def on_hover(self, surface):
@@ -191,6 +255,40 @@ class SwapPopupButton():
             self.on_hover_exit(surface)
         pygame.draw.rect(surface, BLACK, (self.x, self.y, self.rect_width, self.rect_height), 2)
         surface.blit(self.text_surface, self.text_rect)
+
+
+# 설정 팝업창
+class SettingPopup():
+    def __init__(self):
+        self.background = BackGround()  # BackGround 객체 생성
+        self.background_width = self.background.x_pos
+        self.background_height = self.background.screen_height
+
+        self.width = self.background_width * 0.7
+        self.height = self.background_height * 0.7
+        self.x = (self.background_width - self.width) // 2
+        self.y = (self.background_height - self.height) // 2
+
+        # 버튼 x, y, width, height 설정하기
+        self.button_width = self.width * 0.5
+        self.button_height = self.height * 0.15
+        self.spacing = (self.height - 4 * self.button_height) // 5 + self.button_height
+        self.button_x = self.x + (self.width - self.button_width) // 2
+        self.button_y = self.y + self.spacing - self.button_height
+
+        self.setting_button = PopupTextButton(self.button_x, self.button_y, self.button_width, self.button_height, "설정")
+        self.start_button = PopupTextButton(self.button_x, self.button_y + self.spacing, self.button_width, self.button_height, "처음 화면으로")
+        self.continue_button = PopupTextButton(self.button_x, self.button_y + 2*self.spacing, self.button_width, self.button_height, "계속하기")
+        self.exit_button = PopupTextButton(self.button_x, self.button_y + 3*self.spacing, self.button_width, self.button_height, "종료하기")
+
+
+    def popup_draw(self, surface):
+        pygame.draw.rect(surface, WHITE, (self.x, self.y, self.width, self.height))
+        pygame.draw.rect(surface, BLACK, (self.x, self.y, self.width, self.height), 2)
+        self.setting_button.draw(surface)
+        self.start_button.draw(surface)
+        self.continue_button.draw(surface)
+        self.exit_button.draw(surface)
 
 
 # 스왑 상대를 선택하는 팝업창
