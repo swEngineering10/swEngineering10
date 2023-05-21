@@ -34,7 +34,11 @@ class GameInit(object):
         self.PlayedCard = 0             # 몇 번째 카드를 냈는가?
         self.isUnChecked = True         # 다음 코드를 확인하였는가? (한 번만 실행되어야 하는 코드)
         self.isUnChecked2 = True
-        self.cardSwapAni = None         # 카드 스왑 애니메이션 플래그
+
+        self.alertDelay = 0             # 팝업 몇초간 띄우기
+        self.alertType = None           # 팝업 종류
+        self.colorDelay = False         # AI가 색깔을 선택하는데 기다리는 시간 설정
+        self.isAIPlayed = False
 
         # 콘솔 출력용
         self.A = 0

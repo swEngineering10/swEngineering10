@@ -164,6 +164,11 @@ def play_game(ob, cards):
                 if ob.currentCard[0] != "Wild" :     # Wild라면 special_card() 함수 계속 돌아야 하므로 False
                     ob.isCardPlayed = False
 
+                if ob.currentCard[1] == "Skip" :
+                    ob.alertType = "skip"
+                elif ob.currentCard[1] == "Reverse" :
+                    ob.alertType = "direction_change"
+
             ob.turnCount += 1
             
     elif ob.Draw2Attack == True:    #Draw2 공격 상태라면
@@ -268,6 +273,8 @@ def special_card(ob, cards):
                             for i in range(len(ob.playerList[ob.playerTurn])) :
                                 ob.my_card_list.append(CardLoad(ob.playerList[ob.playerTurn][i]))
                                 ob.my_card_list[i].swap_card_pop_image(ob.my_card_list)
+
+                            ob.alertType = "swap"
 
                             ob.isUnChecked2 = False
 
@@ -378,21 +385,15 @@ def color_change(ob):
         # currentCard의 색깔 바꾸기
         if ob.currentCard[1] == "Color_Change" :
             ob.currentCard = (ob.cardColor[newColour-1], "Color_Change")
-            # ob.current_card_image = pygame.image.load(f"assets/images/cards/{ob.cardColor[newColour-1]}_Color_Change.png")
-            ob.current_card_image = CardLoad((ob.cardColor[newColour-1], "Color_Change"))
-            ob.isColorChanged = True
+            ob.current_card_image.image = pygame.image.load(f"assets/images/cards/{ob.cardColor[newColour-1]}_Color_Change.png")
         elif ob.currentCard[1] == "Draw4" :
             ob.currentCard = (ob.cardColor[newColour-1], "Draw4")
-            # ob.current_card_image = pygame.image.load(f"assets/images/cards/{ob.cardColor[newColour-1]}_Draw4.png") 
-            ob.current_card_image = CardLoad((ob.cardColor[newColour-1], "Draw4"))
-            ob.isColorChanged = True
+            ob.current_card_image.image = pygame.image.load(f"assets/images/cards/{ob.cardColor[newColour-1]}_Draw4.png")
         elif ob.currentCard[1] == "Swap" : 
             ob.currentCard = (ob.cardColor[newColour-1], "Swap")
-            # ob.current_card_image = pygame.image.load(f"assets/images/cards/{ob.cardColor[newColour-1]}_Swap.png") 
-            ob.current_card_image = CardLoad((ob.cardColor[newColour-1], "Swap"))
-            ob.isColorChanged = True
+            ob.current_card_image.image = pygame.image.load(f"assets/images/cards/{ob.cardColor[newColour-1]}_Swap.png")
 
-        print(ob.cardColor[newColour-1],"라는 색깔을 선택합니다!")
+        ob.alertType = "color_change"
         ob.currentPopup = None  # 팝업 닫기
 
         # 아래는 변수 원상복구
@@ -424,6 +425,8 @@ def set_turn(ob):
             ob.playerTurn += ob.playDirection
             over_turn(ob)
         elif ob.currentCard[1] == "Skip" or ob.openDeck[1][-1] == "Draw4":
+            if ob.currentCard[1] == "Skip" :
+                ob.alertType = "direction_change"
             print("다다음 턴으로 넘어갑니다!")
             ob.playerTurn += ob.playDirection * 2
             over_turn(ob)
