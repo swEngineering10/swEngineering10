@@ -7,20 +7,20 @@ from utility import CardLoad
 
 #ai가 카드 색깔을 바꾸는 함수
 def ai_color_change(ob):    
-    print("바꿀 색깔을 1. Blue 2. Red 3.Green 4. Yellow중에서 무작위로 고릅니다.")
-    newColour = randint(1, 4)
+    newColour = randint(1, 4)   # 색깔 무작위로 선택
+
+    # currentCard의 색깔 바꾸기
     if ob.currentCard[1] == "Color_Change" :
         ob.currentCard = (ob.cardColor[newColour-1], "Color_Change")
-        ob.current_card_image = CardLoad((ob.cardColor[newColour-1], "Color_Change"))
     elif ob.currentCard[1] == "Draw4" :
         ob.currentCard = (ob.cardColor[newColour-1], "Draw4")
-        ob.current_card_image = CardLoad((ob.cardColor[newColour-1], "Draw4"))         
     elif ob.currentCard[1] == "Swap" : 
         ob.currentCard = (ob.cardColor[newColour-1], "Swap")
-        ob.current_card_image = CardLoad((ob.cardColor[newColour-1], "Swap"))
-    print(ob.cardColor[newColour-1],"라는 색깔을 선택합니다!")
-    ob.playerTurn += ob.playDirection
-    over_turn(ob)
+
+    ob.colorDelay = 0    
+    ob.currentPopup = None
+    ob.IsChallenge = None
+    ob.isUnChecked = True
 
 
 #다음 playerTurn턴 정할 때 숫자가 넘치지 않나 검사하는 함수

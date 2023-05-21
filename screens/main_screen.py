@@ -46,7 +46,7 @@ class MainScreen(Screen):
         
         # 게임 객체 생성
         self.game_init = GameInit()
-        self.game_init.numPlayers = 5  # 유저 포함 플레이어의 수 가정 (나중에 로비에서 값 받아야 함!!)
+        self.game_init.numPlayers = 3  # 유저 포함 플레이어의 수 가정 (나중에 로비에서 값 받아야 함!!)
 
         # 카드 덱 (미오픈) 이미지 로드
         self.game_init.card_back_image = CardLoad(("card", "back"))
@@ -85,8 +85,11 @@ class MainScreen(Screen):
         self.select_swap_button_list = self.select_swap_popup.swap_button_list
 
         # 게임 진행 정보 팝업 관련
-        self.swap_notif = InfoPopup("카드가 스왑되었습니다!")
+        self.swap_notif = InfoPopup("스왑 카드가 사용되어 플레이어 둘의 덱이 바뀝니다!")
         self.fail_challenge = InfoPopup("도전에 실패했습니다! 다음 플레이어가 4장을 받습니다.")
+        self.color_change = InfoPopup("색깔이 변경됩니다!")
+        self.direction_change = InfoPopup("게임 방향이 전환됩니다!")
+        self.skip_notif = InfoPopup("스킵 카드가 발동되어 턴을 하나 건너뜁니다!")
 
 
     
@@ -145,12 +148,11 @@ class MainScreen(Screen):
             if self.game_init.currentPopup == "select_swap":
                 for select_swap_button in self.select_swap_button_list:
                     select_swap_button.handle_event(event, self.game_init, self.screen)
-            
 
 
         # 게임 실행
         if self.game_init.myTurn == self.game_init.playerTurn :
-            if self.game_init.delay == 100 :
+            if self.game_init.delay == 200 :
                 play_game(self.game_init, self.game_init.playerList[self.game_init.playerTurn])
                 self.game_init.delay = 0
         else:
@@ -158,6 +160,25 @@ class MainScreen(Screen):
             if self.game_init.delay == 200 :
                 ai_play_game(self.game_init, self.game_init.playerList[self.game_init.playerTurn])
                 self.game_init.delay = 0
+
+
+        # 이미지 새로 세팅 후 팝업창 띄우기
+        if (self.game_init.delay == 150) and self.game_init.isAIPlayed :
+
+            # currentCard의 색깔 바꾸기
+            if self.game_init.currentCard[1] == "Color_Change" :
+                self.game_init.current_card_image.image = pygame.image.load(f"assets/images/cards/{self.game_init.currentCard[0]}_Color_Change.png")
+                self.game_init.alertType = "color_change"   # 알림창 띄우기
+
+            elif self.game_init.currentCard[1] == "Draw4" :
+                self.game_init.current_card_image.image = pygame.image.load(f"assets/images/cards/{self.game_init.currentCard[0]}_Draw4.png")
+                self.game_init.alertType = "color_change"   # 알림창 띄우기
+
+            elif self.game_init.currentCard[1] == "Swap" : 
+                self.game_init.current_card_image.image = pygame.image.load(f"assets/images/cards/{self.game_init.currentCard[0]}_Swap.png")
+                self.game_init.alertType = "color_change"   # 알림창 띄우기
+
+            self.game_init.isAIPlayed = False
 
         self.game_init.delay += 1
 
@@ -171,7 +192,25 @@ class MainScreen(Screen):
             self.swap_popup.popup_draw(self.screen)
         elif self.game_init.currentPopup == "select_swap" :
             self.select_swap_popup.popup_draw(self.screen)
+        
+        # 알림창 로드
+        if self.game_init.alertType != None :
+            self.game_init.alertDelay += 1
+            if self.game_init.alertType == "swap" :
+                self.swap_notif.popup_draw(self.screen)
+            elif self.game_init.alertType == "fail_challenge" :
+                self.fail_challenge.popup_draw(self.screen)
+            elif self.game_init.alertType == "color_change" :
+                self.color_change.popup_draw(self.screen)
+            elif self.game_init.alertType == "direction_change" :
+                self.direction_change.popup_draw(self.screen)
+            elif self.game_init.alertType == "skip" :
+                self.skip_notif.popup_draw(self.screen)
 
+            # 알림창 일정 시간이 지나면 없어지도록 설정
+            if self.game_init.alertDelay >= 200 :
+                self.game_init.alertType = None
+                self.game_init.alertDelay = 0
             
         # 팝업 test 용도
         # self.game_init.currentPopup = "color_change"

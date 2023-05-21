@@ -19,8 +19,6 @@ from screens.lobby_screen import LobbyScreen
 from screens.setting_screen import SettingScreen
 from screens.keysetting_screen import KeyScreen
 from screens.map_screen import MapScreen
-from network_client import Client
-from network_server import Server
 from screens.client_lobby import ClientLobby
 
 from utilities.image_utility import load_image
@@ -87,7 +85,7 @@ def main():
     fps = 120
     clock = pygame.time.Clock()
 
-    current_screen = StartScreen(screen, manager, networking)
+    current_screen = MainScreen(screen, manager, networking)
 
     # 인증 부분
     '''
