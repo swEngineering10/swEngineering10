@@ -23,6 +23,8 @@ from utility import handle_click_card
 from utility import CardLoad
 from button import SelectColorPopup
 from button import IsChanllengePopup
+from button import IsSwapPopup
+from button import SelectSwapPopup
 from button import InfoPopup
 from game_class import GameInit
 from client.networking import Networking
@@ -74,7 +76,16 @@ class MainScreen(Screen):
         self.challenge_popup = IsChanllengePopup()
         self.challenge_button_list = [self.challenge_popup.challenge_button, self.challenge_popup.giveup_button]
 
+        # 스왑 여부 선택 팝업 관련
+        self.swap_popup = IsSwapPopup()
+        self.swap_popup_button_list = [self.swap_popup.swap_button, self.swap_popup.not_swap_button]
+
+        # 스왑 선택 팝업 관련
+        self.select_swap_popup = SelectSwapPopup(self.game_init)
+        self.select_swap_button_list = self.select_swap_popup.swap_button_list
+
         # 게임 진행 정보 팝업 관련
+        self.swap_notif = InfoPopup("카드가 스왑되었습니다!")
         self.fail_challenge = InfoPopup("도전에 실패했습니다! 다음 플레이어가 4장을 받습니다.")
 
 
@@ -112,8 +123,6 @@ class MainScreen(Screen):
         self.user_card_load()
         self.player_card_load()
         self.current_card_ani()
-        if self.game_init.isColorChanged :
-            self.game_init.current_card_image.card_load(self.screen, self.game_init.current_card_image[-1].current_card_pos)
 
 
         for event in events:
@@ -125,15 +134,25 @@ class MainScreen(Screen):
                 for color_button in self.color_button_list:
                     color_button.handle_event(event, self.game_init, self.screen)
             
-            elif self.game_init.currentPopup == "challenge":
+            if self.game_init.currentPopup == "challenge":
                 for challenge_button in self.challenge_button_list:
                     challenge_button.handle_event(event, self.game_init, self.screen)
+
+            if self.game_init.currentPopup == "is_swap":
+                for swap_button in self.swap_popup_button_list:
+                    swap_button.handle_event(event, self.game_init, self.screen)
+
+            if self.game_init.currentPopup == "select_swap":
+                for select_swap_button in self.select_swap_button_list:
+                    select_swap_button.handle_event(event, self.game_init, self.screen)
+            
 
 
         # 게임 실행
         if self.game_init.myTurn == self.game_init.playerTurn :
-            play_game(self.game_init, self.game_init.playerList[self.game_init.playerTurn])
-            self.game_init.delay = 0
+            if self.game_init.delay == 100 :
+                play_game(self.game_init, self.game_init.playerList[self.game_init.playerTurn])
+                self.game_init.delay = 0
         else:
             # 컴퓨터 플레이어 딜레이 주기
             if self.game_init.delay == 200 :
@@ -148,6 +167,17 @@ class MainScreen(Screen):
             self.color_popup.popup_draw(self.screen)
         elif self.game_init.currentPopup == "challenge" :
             self.challenge_popup.popup_draw(self.screen)
+        elif self.game_init.currentPopup == "is_swap" :
+            self.swap_popup.popup_draw(self.screen)
+        elif self.game_init.currentPopup == "select_swap" :
+            self.select_swap_popup.popup_draw(self.screen)
+
+            
+        # 팝업 test 용도
+        # self.game_init.currentPopup = "color_change"
+        # self.game_init.currentPopup = "challenge"
+        # self.game_init.currentPopup = "is_swap"
+        # self.game_init.currentPopup = "select_swap"
 
 
         if self.networking.current_game.is_started:

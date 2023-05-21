@@ -161,7 +161,7 @@ def play_game(ob, cards):
                 special_card(ob, cards)
                 set_turn(ob)
 
-                if ob.currentCard[0] != "Wild" :
+                if ob.currentCard[0] != "Wild" :     # Wild라면 special_card() 함수 계속 돌아야 하므로 False
                     ob.isCardPlayed = False
 
             ob.turnCount += 1
@@ -201,10 +201,6 @@ def play_game(ob, cards):
                 set_turn(ob)
 
             ob.turnCount += 1
-
-    # current card 저장
-
-    # 상대방 플레이어 카드 개수 갱신
 
 
 #중복 카드 검사
@@ -246,9 +242,45 @@ def special_card(ob, cards):
             color_change(ob)
             
         if ob.currentCard[1] == "Swap":
-            swapedPlayer= int(input("몇번째 플레이어와 카드를 바꾸겠습니까?"))
-            ob.playerList[ob.playerTurn], ob.playerList[swapedPlayer] = ob.playerList[swapedPlayer], ob.playerList[ob.playerTurn]
-            color_change(ob)
+            ob.currentPopup = "is_swap"   # 스왑 팝업창 띄우기
+            if ob.IsSwap != None :  # 스왑 여부 버튼 누르기 전까지 다음 턴 X
+
+                # 바꾸기 누른 경우
+                if ob.IsSwap == True :
+                    ob.currentPopup = "select_swap"    # 스왑 플레이어 선택 팝업창 띄우기
+                    if ob.swapNumber != None :  # 스왑할 플레이어 버튼 누르기 전까지 다음 턴 X
+                        swapedPlayer = ob.swapNumber
+
+                        # 아래는 한번만 실행 (아닐 경우 루프 돌면서 계속 서로 스왑)
+                        if ob.isUnChecked2 :
+                            ob.A += 1
+                            # 스왑
+                            ob.playerList[ob.playerTurn], ob.playerList[swapedPlayer] = ob.playerList[swapedPlayer], ob.playerList[ob.playerTurn]
+                            
+                            # 내 이미지 갱신
+                            # 카드의 origin_pos를 스왑 플레이어로 설정
+                            x = ob.player_deck_image_list[swapedPlayer - 1].player_pos[0]
+                            y = ob.player_deck_image_list[swapedPlayer - 1].player_pos[1]
+                            pos = [x, y]
+                            
+                            # 카드 리스트 초기화
+                            ob.my_card_list = []
+                            for i in range(len(ob.playerList[ob.playerTurn])) :
+                                ob.my_card_list.append(CardLoad(ob.playerList[ob.playerTurn][i]))
+                                ob.my_card_list[i].swap_card_pop_image(ob.my_card_list)
+
+                            ob.isUnChecked2 = False
+
+                        # 상대방 카드 이미지 갱신
+                        ob.player_deck_image_list[swapedPlayer - 1].player_card_num = len(ob.playerList[swapedPlayer])
+
+                        color_change(ob)
+
+                # 바꾸기 누르지 않은 경우 swapedPlayer에 0 전달하기 (자기 자신과 스왑)
+                elif ob.IsSwap == False : 
+                    swapedPlayer = 0
+                    ob.playerList[ob.playerTurn], ob.playerList[swapedPlayer] = ob.playerList[swapedPlayer], ob.playerList[ob.playerTurn]
+                    color_change(ob)
         
         if ob.currentCard[1] == "Draw4":
 
@@ -362,9 +394,13 @@ def color_change(ob):
 
         print(ob.cardColor[newColour-1],"라는 색깔을 선택합니다!")
         ob.currentPopup = None  # 팝업 닫기
-        ob.selectedColor = None # 선택 컬러 None으로 바꾸기
+
+        # 아래는 변수 원상복구
+        ob.selectedColor = None
         ob.isCardPlayed = False # 카드 냄 (더이상 play_game 반복 X)
-        ob.isUnChecked = True   # 변수 원상복귀
+        ob.isUnChecked = True
+        ob.isUnChecked2 = True
+        ob.IsSwap == None
         ob.isColorChanged = False
 
         ob.playerTurn += ob.playDirection

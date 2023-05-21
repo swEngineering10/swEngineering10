@@ -16,7 +16,7 @@ class CardLoad:
         self.background = BackGround()  # BackGround 객체 생성
         self.current_card_pos = self.opendeck_image_pos()  # currentCard(오픈 카드)일 때 이미지 위치
         self.deck_pos = self.deck_image_pos()    # 덱 좌표
-        self.speed = 7  # 이동 속도
+        self.speed = 5  # 이동 속도
         self.spacing = 15   # myboard와 카드와의 간격
         self.cards_per_row = 12  # myboard에서 한 줄당 카드의 수
         self.x_interval = self.background.card_pos(self.background.my_board_image.get_rect().size,
@@ -76,10 +76,27 @@ class CardLoad:
 
         self.target_pos = [x_pos, y_pos]
         self.position = self.target_pos     # 현재 좌표 설정
-    
+
+
+    # 스왑 카드 받을 때 좌표
+    def swap_card_pop_image(self, card_list):
+
+        self.card_count = len(card_list) - 1
+
+        # playerList에 있는 카드에 수에 따라 좌표 계산
+        value1 = self.card_count // self.cards_per_row # 몫 0 ~ 2
+        y_pos = self.spacing + value1 * self.y_interval + self.background.board_image_size()[1]
+        value2 = self.card_count % self.cards_per_row  # 나머지 0 ~ cards_per_row - 1
+        x_pos = self.spacing + value2 * self.x_interval
+
+        self.origin_pos = [x_pos, y_pos]
+        self.target_pos = [x_pos, y_pos]
+        self.position = self.target_pos     # 현재 좌표 설정 
+
 
     # 이미지 애니메이션
     def image_animation(self, surface):
+
         self.image_rect.x = self.origin_pos[0]
         self.image_rect.y = self.origin_pos[1]
 
@@ -145,7 +162,8 @@ class PlayerState:
         self.player_bg = BackGround()
         self.player_num = player_num
         self.player_name = "컴퓨터 " + str(player_num)
-        self.player_pos = self.player_pos_change()
+        self.player_pos = [0, 0]
+        self.player_pos_change()
         self.player_card_num = 7    # 가지고 있는 카드의 개수
         self.player_cards_per_row = 10    # 한 줄당 카드의 개수
         self.player_spacing = 5
@@ -163,7 +181,7 @@ class PlayerState:
         x = self.player_bg.x_pos + self.player_bg.state_spacing
         y = self.player_bg.state_spacing
         interval = self.player_bg.player_state_image.get_rect().height + self.player_bg.state_spacing
-        return [x, y + (self.player_num - 1) * interval]
+        self.player_pos = [x, y + (self.player_num - 1) * interval]
 
     # 플레이어 상태 이미지 로드
     def player_state_draw(self, surface):
