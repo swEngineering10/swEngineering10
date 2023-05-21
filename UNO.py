@@ -16,11 +16,17 @@ from screens.start_screen import StartScreen
 from screens.main_screen import MainScreen
 from screens.volume_screen import VolumeScreen
 from screens.lobby_screen import LobbyScreen
+from screens.setting_screen import SettingScreen
+from screens.keysetting_screen import KeyScreen
+from screens.map_screen import MapScreen
+from network_client import Client
+from network_server import Server
+from screens.client_lobby import ClientLobby
 
 from utilities.image_utility import load_image
 from utilities.text_utility import truncate
 
-#from button import *
+# from button import *
 
 
 # pygame 초기화
@@ -48,9 +54,16 @@ WINDOW_SIZE = (screen_width, screen_height)
 screen = pygame.display.set_mode(WINDOW_SIZE)
 background = pygame.Surface(WINDOW_SIZE)
 
+volume_file = 'volume_setting.json'
+
+if os.path.isfile(volume_file):
+    with open(volume_file, 'r') as f:
+        volume_data = json.load(f)
+
 # 배경음악 생성
 pygame.mixer.init()
 pygame.mixer.music.load("assets/musics/TakeOnMe.mp3")
+pygame.mixer.music.set_volume(volume_data["slider2_value"])
 pygame.mixer.music.play()
 
 # UI manager 생성
@@ -65,10 +78,6 @@ def terminate():
     sys.exit()
 
 
-
-
-
-
 def main():
     networking = Networking()  # SERVER_IP 인자 제외
 
@@ -78,7 +87,7 @@ def main():
     fps = 120
     clock = pygame.time.Clock()
 
-    current_screen = MainScreen(screen, manager, networking)
+    current_screen = StartScreen(screen, manager, networking)
 
     # 인증 부분
     '''
@@ -112,7 +121,8 @@ def main():
             if not current_screen.run(events):
                 manager.clear_and_reset()   # 이부분 위로 올림 (스크린 객체생성보다 아래로 가면 버튼 객체 지워버림)
                 # 현재 화면의 다음 화면을 가져옵니다.
-                current_screen = current_screen.next_screen(screen, manager, networking)
+                current_screen = current_screen.next_screen(
+                    screen, manager, networking)
 
         else:
             terminate()

@@ -83,6 +83,8 @@ class VolumeScreen(Screen):
         self.exit_button = UIButton(
             relative_rect=self.button_rect, text='Exit', manager=manager)
 
+        self.update_volume()
+
     def handle_event(self, event):
         if event.type == pygame_gui.UI_BUTTON_PRESSED:
             if event.ui_element == self.exit_button:
@@ -91,7 +93,19 @@ class VolumeScreen(Screen):
                 self.next_screen = SettingScreen
                 self.is_running = False
 
-         # run 함수
+        if event.type == pygame_gui.UI_HORIZONTAL_SLIDER_MOVED:
+            self.update_volume()
+
+    def update_volume(self):
+        if self.slider1.get_current_value() > 0:
+            self.bgm_volume = self.slider1.get_current_value() / 100.0
+            pygame.mixer.music.set_volume(self.bgm_volume)
+        else:
+            self.bgm_volume = self.slider2.get_current_value() / 100.0
+            pygame.mixer.music.set_volume(self.bgm_volume)
+
+        # run 함수
+
     def run(self, events: list[Event]) -> bool:
 
         self.screen.blit(self.background, (0, 0))
