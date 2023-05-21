@@ -24,10 +24,10 @@ class StartScreen(Screen):
         with open('keys.json', 'r') as f:
             keyboard_data = json.load(f)
 
-        self.key_up = keyboard_data["keyboard"]["up"]
-        self.key_down = keyboard_data["keyboard"]["down"]
-        self.key_left = keyboard_data["keyboard"]["left"]
-        self.key_right = keyboard_data["keyboard"]["right"]
+        self.key_up = keyboard_data["1073741906"]
+        self.key_down = keyboard_data["1073741905"]
+        self.key_left = keyboard_data["1073741904"]
+        self.key_right = keyboard_data["1073741903"]
 
         self.screen_width = config_data['resolution']['width']
         self.screen_height = config_data['resolution']['height']
