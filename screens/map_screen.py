@@ -25,8 +25,8 @@ class MapScreen(Screen):
         self.screen_height = config_data['resolution']['height']
         WINDOW_SIZE = (self.screen_width, self.screen_height)
 
-        self.keyboard_right = keyboard_data["keyboard"]["right"]
-        self.keyboard_left = keyboard_data["keyboard"]["left"]
+        self.keyboard_right = keyboard_data["1073741903"]
+        self.keyboard_left = keyboard_data["1073741904"]
 
         self.background = pygame.Surface(WINDOW_SIZE)
         self.screen = pygame.display.set_mode((WINDOW_SIZE))

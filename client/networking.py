@@ -1,25 +1,29 @@
+from classes.game.game import Game
+from classes.decks.game_deck import GameDeck
+from classes.cards.card import Card
+from classes.auth.user import User
+from classes.auth.exceptions import WrongCredentials
 import sys
 import os
 
 import pickle
 import socket
+import threading
 
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 
-from classes.auth.exceptions import WrongCredentials
-from classes.auth.user import User
-from classes.cards.card import Card
-from classes.decks.game_deck import GameDeck
-from classes.game.game import Game
 
 # 서버와의 통신을 관리하는 싱글톤 클래스
+
 class Networking:
 
     # address와 port를 지정하여 소켓 연결을 설정합니다.
-    def __init__(self): # address: str = socket.gethostname(), port: int = 5499 인자 제외
+    # address: str = socket.gethostname(), port: int = 5499 인자 제외
+    def __init__(self):
         self.current_game: Game = Game([], GameDeck())
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.authorized_user = None
+
         # self._connect(address, port)
 
     # 서버와 소켓 연결을 설정합니다.
@@ -81,7 +85,7 @@ class Networking:
         self.sock.sendall(pickle.dumps(data))
         return pickle.loads(self.sock.recv(2048))
     '''
-    
+
     # 사용자의 점수를 증가시키는 메서드입니다. amount를 송신하여 서버로부터 증가한 점수를 받아옵니다.
     '''
     def add_points(self, amount: int = 0) -> bool:
@@ -109,7 +113,7 @@ class Networking:
     def user_id(self, user) -> int:
         return self.current_game.users.index(user)
     '''
-    
+
     # 현재 사용자의 차례인지 여부를 반환합니다.
     '''
     @property
