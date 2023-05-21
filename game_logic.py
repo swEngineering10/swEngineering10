@@ -1,9 +1,11 @@
 import random
 from random import randint
 import time
+import pygame
 
 from common_function import *
 from utility import handle_click_card
+from utility import CardLoad
 
 # 덱의 가장 위 카드를 뽑아내는 함수
 def pop(cards): 
@@ -33,7 +35,7 @@ def split_cards(ob):    # 카드 7장씩 나누어주기
 
 
 def random_turn(ob):    # 턴 랜덤 지정
-    ob.myTurn = randint(0, ob.numPlayers-1)         # 인간 플레이어 순서 랜덤 지정
+    ob.myTurn = 0                                   # 인간 플레이어 순서 랜덤 지정
     ob.playerTurn = randint(0, ob.numPlayers-1)     # 게임 시작 플레이어 랜덤 지정
     
     print("플레이어는 몇번째 턴?: ", ob.myTurn)
@@ -69,49 +71,43 @@ def start_card(ob):
             print("시작카드가", ob.currentCard,"이기 때문에 다시 뽑습니다!")
             ob.openDeck.append(ob.unopenDeck.pop())  # 미오픈 덱의 첫 번째 카드 오픈 덱으로 이동
             ob.currentCard = pop(ob.openDeck)        # 오픈 덱의 첫번째 카드 저장
-            time.sleep(3)
         else:
             break
+
     if ob.currentCard[1] == "Draw2":
         print("시작카드가", ob.currentCard,"이기 때문에")
         ob.playerList[ob.playerTurn].append(ob.unopenDeck.pop())
         ob.playerList[ob.playerTurn].append(ob.unopenDeck.pop())
         print("시작플레이어인 ",ob.playerTurn,"번째 플레이어가 2장을 먹습니다!")
-        set_turn(ob)
+        print("다다음 턴으로 넘어갑니다!")
+        ob.playerTurn += ob.playDirection * 2
+        over_turn(ob)
+        #set_turn(ob)
+
     elif ob.currentCard[1] == "Reverse":
         print("시작카드가", ob.currentCard,"이기 때문에 순서 전환됩니다!")
-        set_turn(ob)
+        ob.playDirection *= -1
+        ob.playerTurn += ob.playDirection
+        #set_turn(ob)
+
     elif ob.currentCard[0] == "Wild":
         print("시작카드가", ob.currentCard,"이기 때문에 색깔이 랜덤으로 바뀝니다!")
         ai_color_change(ob)
-    time.sleep(1)
 
 
 #카드 내기 전에 현재 턴의 정보를 출력하는 함수
 def print_information(ob, cards):
-    print("-----------------------")
-    print(ob.turnCount,"번째 게임입니다.")
-    print("지금 몇번째 순서?: ", ob.playerTurn)
     ob.available = []          #available: 가지고 있는 덱에서 낼 수 있는 카드 집합
     for card in cards:
         if (card[0] == ob.currentCard[0] or card[1] == ob.currentCard[1] or card[0] == 'Wild'):     #낼 수 있는 카드 판별
             ob.available.append(card)
-    print("놓여진 카드: ", ob.currentCard)       #아래부터 나오는 print들은 다 디버그용
-    print("낼 수 있는 카드: ", ob.available)
-    print("전체 갖고있는 카드", ob.playerList[ob.myTurn])
     
 #이전 카드가 Draw2카드일 때, 내기 전에 정보를 출력하는 함수
 def print_information_Draw2(ob, cards):
-    print("-----------------------")
-    print(ob.turnCount,"번째 게임입니다.")
-    print("지금 몇번째 순서?: ", ob.playerTurn)
     ob.available = []          #available: 가지고 있는 덱에서 낼 수 있는 카드 집합
     for card in cards:
         if (card[1] == 'Draw2'):     #낼 수 있는 카드 판별
             ob.available.append(card)
-    print("놓여진 카드: ", ob.currentCard)       #아래부터 나오는 print들은 다 디버그용
-    print("낼 수 있는 카드: ", ob.available)
-    print("전체 갖고있는 카드", ob.playerList[ob.myTurn])
 
 
 #카드를 한장 먹는 함수
@@ -120,6 +116,7 @@ def add_deck(ob, cards):
     #print("내가 ", cards[-1], "를 먹습니다.")      #디버그용
     print(ob.playerTurn,"번째 플레이어가 한 장을 먹습니다.")
     #ob.currentCard = pop(ob.openDeck)        # 오픈 덱의 첫번째 카드 저장
+
     ob.playerTurn += ob.playDirection
     over_turn(ob)
 
@@ -140,31 +137,38 @@ def play_game(ob, cards):
     
     if ob.Draw2Attack == False:     #Draw2 공격 상태가 아니라면
         print_information(ob, cards)
+        info(ob)
         
         if ob.isCardPlayed == True :
 
             # a = int(input("몇번째 카드를 내겠습니까? (0: 카드먹기, 1: 첫번째 카드, 2: ...)"))
             a = ob.PlayedCard
-            ob.isCardPlayed = False
             
             if a==0:        #카드 먹기
                 add_deck(ob, cards)
+                ob.isCardPlayed = False
         
             else:       #카드 내기
-                ob.doubleWild = ob.currentCard[0]
-                ob.openDeck.append(ob.available[a-1])      # 오픈 덱에 낼 카드 저장
-                ob.currentCard = pop(ob.openDeck)        # 오픈 덱의 첫번째 카드 저장
-                print("내가 낸 카드: ", ob.currentCard)
-                cards.remove(ob.currentCard)            # 플레이어 카드덱에서 낸 카드는 삭제하기
+                if ob.isUnChecked : 
+                    ob.doubleWild = ob.currentCard[0]
+                    ob.openDeck.append(ob.available[a-1])      # 오픈 덱에 낼 카드 저장
+                    ob.currentCard = pop(ob.openDeck)        # 오픈 덱의 첫번째 카드 저장
+                    print("내가 낸 카드: ", ob.currentCard)
+                    cards.remove(ob.currentCard)            # 플레이어 카드덱에서 낸 카드는 삭제하기
+                    ob.isUnChecked = False
+
                 is_repeatedcard(ob, cards)
                 special_card(ob, cards)
-                print("\n")
                 set_turn(ob)
+
+                if ob.currentCard[0] != "Wild" :
+                    ob.isCardPlayed = False
 
             ob.turnCount += 1
             
     elif ob.Draw2Attack == True:    #Draw2 공격 상태라면
         print_information_Draw2(ob, cards)
+        info(ob)
 
         if ob.isCardPlayed == True :
         
@@ -176,8 +180,11 @@ def play_game(ob, cards):
             if a==0:
                 for i in range(0, ob.Draw2Count*2+1):
                     shuffle_card(ob)
-                    ob.playerList[ob.playerTurn].append(ob.unopenDeck.pop())
+                    popCard = ob.unopenDeck.pop()
+                    ob.playerList[ob.playerTurn].append(popCard)    # 카드 리스트에 저장
+                    ob.my_card_list.append(CardLoad(popCard))       # 카드 이이미지 리스트에 저장
                 print("방어 실패! ",ob.playerTurn,"번째 플레이어가", ob.Draw2Count * 2,"장을 먹습니다")
+
                 set_turn(ob)
                 ob.Draw2Attack = False
                 ob.Draw2Count = 0
@@ -196,6 +203,8 @@ def play_game(ob, cards):
             ob.turnCount += 1
 
     # current card 저장
+
+    # 상대방 플레이어 카드 개수 갱신
 
 
 #중복 카드 검사
@@ -242,22 +251,27 @@ def special_card(ob, cards):
             color_change(ob)
         
         if ob.currentCard[1] == "Draw4":
-            print(ob.playerList[ob.myTurn])
-            #challenge = 1          #디버그용
-            challenge = randint(0, 1)       #ai가 공격할 것인가?
-            
-            next_turn(ob)   #다음턴 사람은 누구인가?
-            
-            if challenge==1:        #공격시
-                Draw4(ob, cards)
-            else:       #도전 자체를 하지 않는다면?
-                print("다음턴이 4장을 먹습니다!")
-                for i in range(0, 4):
-                    shuffle_card(ob)
-                    ob.playerList[ob.nextTurn].append(ob.unopenDeck.pop())        #다음턴이 4장 먹음
-            ob.playerTurn += ob.playDirection
-            over_turn(ob)
-            color_change(ob)        
+
+            # Draw4 공격 시 color_change 외 코드는 한 번만 실행
+            if ob.isUnChecked :
+                
+                print(ob.playerList[ob.myTurn])
+
+                challenge = randint(0, 1)       #ai가 공격할 것인가?
+                next_turn(ob)   #다음턴 사람은 누구인가?
+                
+                if challenge==1:        #공격시
+                    Draw4(ob, cards)
+
+                else:       #도전 자체를 하지 않는다면?
+                    print("다음턴이 4장을 먹습니다!")
+                    for i in range(0, 4):
+                        shuffle_card(ob)
+                        ob.playerList[ob.nextTurn].append(ob.unopenDeck.pop())        #다음턴이 4장 먹음
+
+                ob.isUnChecked = False
+
+            color_change(ob)  
                
     if ob.currentCard[1] == "Draw2":        #다음턴이 두장먹기
         Draw2(ob, cards)
@@ -269,7 +283,6 @@ def special_card(ob, cards):
 def Draw4(ob, cards):
     print("다음턴인", ob.nextTurn,"이 도전합니다!")
     is_challenge = 0    #is_challenge: 0이면 공격 실패
-    time.sleep(3)
     for i in cards:
         if i[0] == ob.doubleWild:
             is_challenge = 1
@@ -279,13 +292,19 @@ def Draw4(ob, cards):
         print("현재 플레이어인 ", ob.playerTurn, "이 4장을 먹습니다!")
         for i in range(0, 4):
             shuffle_card(ob)
-            ob.playerList[ob.playerTurn].append(ob.unopenDeck.pop())    #본인이 4장 먹음
+            popCard = ob.unopenDeck.pop()
+            ob.playerList[ob.playerTurn].append(popCard)    # 본인이 4장 먹음
+            if ob.plyerTurn == ob.myTurn :                  # 그 사람이 나면 이미지 추가
+                ob.my_card_list.append(CardLoad(popCard))
     else:       #컴퓨터가 나에게 공격 실패했다면
         print(ob.doubleWild,"와 같은 색상 카드가 없었습니다! 공격실패!")
         print("도전에 실패하였습니다! 다음 플레이어인", ob.nextTurn," 이 6장을 먹습니다!")
         for i in range(0, 6):
             shuffle_card(ob)
-            ob.playerList[ob.nextTurn].append(ob.unopenDeck.pop())        #다음턴이 6장 먹음
+            popCard = ob.unopenDeck.pop()
+            ob.playerList[ob.nextTurn].append(popCard)        # 다음턴이 6장 먹음
+            if ob.nextTurn == ob.myTurn :                                 # 그 사람이 나면 이미지 추가
+                ob.my_card_list.append(CardLoad(popCard))
         
         
 #다음턴이 두장먹기
@@ -314,45 +333,70 @@ def All_In(ob, cards):
     print("\n",ob.currentCard[0],"인 카드인", draw_list,"를 냅니다")
     ob.currentCard = pop(ob.openDeck)        # 오픈 덱의 첫번째 카드 저장
     cards = [i for i in cards if i not in draw_list]     # 플레이어 카드덱에서 낸 카드는 삭제하기
+    ob.playerTurn += ob.playDirection
+    over_turn(ob)
         
     
 #내가 카드 색깔을 바꾸는 함수  
 def color_change(ob):
-    newColour = int(input("바꿀 색깔을 1. Blue 2. Red 3.Green 4. Yellow중에서 고르세요."))
-    ob.currentCard = (ob.cardColor[newColour-1], " ")
-    print(ob.cardColor[newColour-1],"라는 색깔을 선택합니다!")
+    ob.currentPopup = "color_change" 
+    if ob.selectedColor != None :
+        newColour = ob.selectedColor
+
+        # currentCard의 색깔 바꾸기
+        if ob.currentCard[1] == "Color_Change" :
+            ob.currentCard = (ob.cardColor[newColour-1], "Color_Change")
+            # ob.current_card_image = pygame.image.load(f"assets/images/cards/{ob.cardColor[newColour-1]}_Color_Change.png")
+            ob.current_card_image = CardLoad((ob.cardColor[newColour-1], "Color_Change"))
+            ob.isColorChanged = True
+        elif ob.currentCard[1] == "Draw4" :
+            ob.currentCard = (ob.cardColor[newColour-1], "Draw4")
+            # ob.current_card_image = pygame.image.load(f"assets/images/cards/{ob.cardColor[newColour-1]}_Draw4.png") 
+            ob.current_card_image = CardLoad((ob.cardColor[newColour-1], "Draw4"))
+            ob.isColorChanged = True
+        elif ob.currentCard[1] == "Swap" : 
+            ob.currentCard = (ob.cardColor[newColour-1], "Swap")
+            # ob.current_card_image = pygame.image.load(f"assets/images/cards/{ob.cardColor[newColour-1]}_Swap.png") 
+            ob.current_card_image = CardLoad((ob.cardColor[newColour-1], "Swap"))
+            ob.isColorChanged = True
+
+        print(ob.cardColor[newColour-1],"라는 색깔을 선택합니다!")
+        ob.currentPopup = None  # 팝업 닫기
+        ob.selectedColor = None # 선택 컬러 None으로 바꾸기
+        ob.isCardPlayed = False # 카드 냄 (더이상 play_game 반복 X)
+        ob.isUnChecked = True   # 변수 원상복귀
+        ob.isColorChanged = False
+
+        ob.playerTurn += ob.playDirection
+        over_turn(ob)
 
 
 #순서를 정하는 함수
 def set_turn(ob): 
+    over_turn(ob)
+    # 완료되었을 때 남은 카드의 개수 저장
+    for i in range(1, ob.numPlayers) :
+        ob.player_deck_image_list[i - 1].player_card_num = len(ob.playerList[i])
+
     try:
         if ob.currentCard[1] == "Reverse":
             print("순서가 바뀝니다!")
             ob.playDirection *= -1
             ob.playerTurn += ob.playDirection
+            over_turn(ob)
         elif len(ob.openDeck) == 0:
             ob.playerTurn += ob.playDirection
+            over_turn(ob)
         elif ob.currentCard[1] == "Skip" or ob.openDeck[1][-1] == "Draw4":
             print("다다음 턴으로 넘어갑니다!")
             ob.playerTurn += ob.playDirection * 2
-        else:
+            over_turn(ob)
+        elif (ob.currentCard[1] != "Color_Change") & (ob.currentCard[1] != "Swap") & (ob.currentCard[1] != "All_In") :
             ob.playerTurn += ob.playDirection
+            over_turn(ob)
     except IndexError:
         ob.playerTurn += ob.playDirection
-    over_turn(ob)
-    time.sleep(3)
-
-
-#다음 playerTurn턴 정할 때 숫자가 넘치지 않나 검사하는 함수
-def over_turn(ob):
-    if ob.playerTurn == ob.numPlayers + 1:
-        ob.playerTurn = 1
-    elif ob.playerTurn == ob.numPlayers:
-        ob.playerTurn = 0
-    elif ob.playerTurn == -1:
-        ob.playerTurn = ob.numPlayers - 1
-    elif ob.playerTurn == -2:
-        ob.playerTurn = ob.numPlayers - 2
+        over_turn(ob)
         
 
 #다음 nextTurn턴 정할 때 숫자가 넘치지 않나 검사하는 함수(Draw2, Draw4일때만 씀)
@@ -407,5 +451,15 @@ def print_rank(ob):
         if i != ob.winner:
             print(i,"번째 플레이어: ", ob.score[i])
             
-            
-           
+
+def info(ob):
+        # 현재 유저 정보 출력
+        print("*")
+        print(ob.turnCount,"번째 턴입니다.")
+        print("현재 턴 번호: ", ob.playerTurn)
+        print("맨 위 current 카드: ", ob.currentCard)
+        print("유저 전체 카드", ob.playerList[0])
+        print("플레이어1 전체 카드", ob.playerList[1])
+        print("플레이어2 전체 카드", ob.playerList[2])
+        print("플레이어3 전체 카드", ob.playerList[3])
+        print("플레이어4 전체 카드", ob.playerList[4])
