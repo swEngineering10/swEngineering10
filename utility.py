@@ -77,6 +77,8 @@ class CardLoad:
         self.target_pos = [x_pos, y_pos]
         self.position = self.target_pos     # 현재 좌표 설정
 
+        self.image_rect.x, self.image_rect.y = self.position
+
 
     # 스왑 카드 받을 때 좌표
     def swap_card_pop_image(self, card_list):

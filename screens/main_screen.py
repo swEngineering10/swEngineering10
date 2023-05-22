@@ -50,7 +50,7 @@ class MainScreen(Screen):
         
         # 게임 객체 생성
         self.game_init = GameInit()
-        self.game_init.numPlayers = 5  # 유저 포함 플레이어의 수 가정 (나중에 로비에서 값 받아야 함!!)
+        self.game_init.numPlayers = 2  # 유저 포함 플레이어의 수 가정 (나중에 로비에서 값 받아야 함!!)
 
         # 카드 덱 (미오픈) 이미지 로드
         self.game_init.card_back_image = CardLoad(("card", "back"))
@@ -62,11 +62,15 @@ class MainScreen(Screen):
         self.game_init.open_deck_image_list.append(CardLoad(self.game_init.currentCard))
         self.game_init.current_card_image = self.game_init.open_deck_image_list[0]
         
+        
         # 유저 보유 카드 리스트 모두 CardLoad 객체 생성 후 이미지 로드
         split_cards(self.game_init)
         for i in range(len(self.game_init.playerList[self.game_init.myTurn])) :
             self.game_init.my_card_list.append(CardLoad(self.game_init.playerList[self.game_init.myTurn][i]))
             self.game_init.my_card_list[i].card_pop_image(self.game_init.my_card_list)
+
+        # 디버깅용
+        self.game_init.playerList[1] = [("Wild", "Draw4")]
 
         # computer player 이미지 객체 생성 (1 ~ numPlayers-1)
         for i in range(1, self.game_init.numPlayers) :
@@ -102,6 +106,7 @@ class MainScreen(Screen):
         self.fail_challenge = InfoPopup("도전에 실패했습니다! 다음 플레이어가 6장을 받습니다.")
         self.success_challenge = InfoPopup("도전에 성공했습니다! 현재 플레이어가 4장을 받습니다.")
         self.giveup_challenge = InfoPopup("도전을 포기합니다. 다음 플레이어가 4장을 받습니다.")
+
 
 
     
@@ -175,9 +180,11 @@ class MainScreen(Screen):
         # 게임 실행
         if self.game_init.isPaused == False :
             if self.game_init.myTurn == self.game_init.playerTurn :
+                self.game_init.isAIPlayed = False
                 if self.game_init.delay == 200 :
                     play_game(self.game_init, self.game_init.playerList[self.game_init.playerTurn])
                     self.game_init.delay = 0
+                    self.game_init.isUnChecked0 = True
             else:
                 # 컴퓨터 플레이어 딜레이 주기
                 if self.game_init.delay == 300 :
@@ -190,16 +197,22 @@ class MainScreen(Screen):
 
             # currentCard의 색깔 바꾸기
             if self.game_init.currentCard[1] == "Color_Change" :
-                print("색깔 변경")
                 self.game_init.current_card_image.image = pygame.image.load(f"assets/images/cards/{self.game_init.currentCard[0]}_Color_Change.png")
+                if self.game_init.alertType != None :
+                    self.game_init.alertDelay = 0
                 self.game_init.alertType = "color_change"   # 알림창 띄우기
 
             elif self.game_init.currentCard[1] == "Draw4" :
-                self.game_init.current_card_image.image = pygame.image.load(f"assets/images/cards/{self.game_init.currentCard[0]}_Draw4.png")
-                self.game_init.alertType = "color_change"   # 알림창 띄우기
+                if self.game_init.currentCard[0] != "Wild" :    # 색깔 선택했을 때만!
+                    self.game_init.current_card_image.image = pygame.image.load(f"assets/images/cards/{self.game_init.currentCard[0]}_Draw4.png")
+                    if self.game_init.alertType != None :
+                        self.game_init.alertDelay = 0
+                    self.game_init.alertType = "color_change"   # 알림창 띄우기
 
             elif self.game_init.currentCard[1] == "Swap" : 
                 self.game_init.current_card_image.image = pygame.image.load(f"assets/images/cards/{self.game_init.currentCard[0]}_Swap.png")
+                if self.game_init.alertType != None :
+                    self.game_init.alertDelay = 0
                 self.game_init.alertType = "color_change"   # 알림창 띄우기
 
             self.game_init.isAIPlayed = False

@@ -6,17 +6,17 @@ import pygame
 #ai 게임 진행 함수
 def ai_play_game(ob, cards):        
     shuffle_card(ob)
-
-    # 현재 플레이어 인덱스 저장
-    pre_player = ob.playerTurn
-
+                                                                          
     if ob.Draw2Attack == False:     #Draw2 공격 상태가 아니라면
-        print_information(ob, cards)
-        info(ob)
-        if len(ob.available)==0:        # 카드 먹기
+        if ob.currentCard != ("Wild", "Draw4") :
+            print_information(ob, cards)
+            info(ob)
+
+        if (len(ob.available) == 0) and (ob.currentCard != ("Wild", "Draw4")):        # 낼 수 있는 카드가 없고 draw4 아닐 때 받기
             add_deck(ob, cards)
     
-        else:       #카드 내기
+        # 카드 내기
+        elif (len(ob.available) != 0) or (ob.currentCard == ("Wild", "Draw4")):       # 낼 수 있는 카드가 있거나 draw4이면 내기
             if ob.smartAi == True:      #지역A의 똑똑한 AI라면?
                 for card in ob.available:
                     if (card[1] == 'Skip'):     #낼 수 있는 카드 판별
@@ -30,7 +30,7 @@ def ai_play_game(ob, cards):
                         return
                 stupid_ai(ob, cards)        #skip 카드가 없었다면 평범하게 실행
             else:       #A지역이 아니라면
-                stupid_ai(ob, cards)
+                stupid_ai(ob, cards) # 여기에서 currentCard 바뀜!!!!!!!!!!!!!!!!!!!!!!!!
 
             if ob.currentCard[1] == "Skip" :
                 ob.alertType = "skip"
@@ -63,17 +63,23 @@ def ai_play_game(ob, cards):
             set_turn(ob)
 
 
-    # 완료되었을 때 남은 currentCard 이미지 변경
-    if (ob.currentCard[1] == "Color_Change") or (ob.currentCard[1] == "Swap") or (ob.currentCard[1] == "Draw4") :
-        ob.open_deck_image_list.append(CardLoad(("Wild", ob.currentCard[1])))
-    else :
-        ob.open_deck_image_list.append(CardLoad(ob.currentCard))
-    ob.current_card_image = ob.open_deck_image_list[-1]
+    if ob.isUnChecked0 :
+        # 완료되었을 때 남은 currentCard 이미지 변경
+        if (ob.currentCard[1] == "Color_Change") or (ob.currentCard[1] == "Swap") or (ob.currentCard[1] == "Draw4") :
+            ob.open_deck_image_list.append(CardLoad(("Wild", ob.currentCard[1])))
+        else :
+            ob.open_deck_image_list.append(CardLoad(ob.currentCard))
 
-    # 컴퓨터 플레이어가 카드 낼 때 애니메이션
-    ob.current_card_image.set_current_pos([ob.player_deck_image_list[pre_player - 1].player_pos[0], ob.player_deck_image_list[pre_player - 1].player_pos[1]])
+        ob.current_card_image = ob.open_deck_image_list[-1]
+        # 컴퓨터 플레이어가 카드 낼 때 애니메이션
+        if ob.currentCard == ("Wild", "Draw4") :
+            ob.current_card_image.set_current_pos([ob.player_deck_image_list[ob.playerTurn-1].player_pos[0], ob.player_deck_image_list[ob.playerTurn-1].player_pos[1]])
+        else :
+            ob.current_card_image.set_current_pos([ob.player_deck_image_list[ob.playerTurn-1].player_pos[0], ob.player_deck_image_list[ob.playerTurn-1].player_pos[1]])
 
-    ob.isAIPlayed = True    # 컴퓨터가 플레이했음을 알리는 변수
+        ob.isUnChecked0 = False
+
+    ob.isAIPlayed = True
 
     ob.turnCount += 1
 
@@ -118,7 +124,22 @@ def ai_special_card(ob, cards):
                 ob.isUnChecked = False
 
             if ob.nextTurn != ob.myTurn:      #다음턴이 ai면
-                challenge = randint(0, 1)       #ai가 공격할 것인가?
+                challenge = randint(0, 1)       #ai가 공격할 것인가? (0: 공격하지 않음, 1: 공격함)
+                if challenge==1:        #공격시
+                    Draw4(ob, cards)
+                else:       #도전 자체를 하지 않는다면?
+                    ob.alertType = "giveup_challenge"    # 다음 플레이어가 4장 받는 알림창 띄우기
+                    for i in range(0, 4):
+                        shuffle_card(ob)
+
+                        popCard = ob.unopenDeck.pop()
+                        ob.playerList[ob.nextTurn].append(popCard)
+                                
+                    ai_color_change(ob)
+                    ob.playerTurn += ob.playDirection
+                    over_turn(ob) 
+                    ob.playerTurn += ob.playDirection   
+                    over_turn(ob)
 
             elif ob.nextTurn == ob.myTurn:    #다음턴이 내차례라면
 
@@ -131,21 +152,20 @@ def ai_special_card(ob, cards):
                         Draw4(ob, cards)
                         
                     else:       #도전 자체를 하지 않는다면?
-                        ob.alertType == "fail_challenge"    # 다음 플레이어가 4장 받는 알림창 띄우기
-                        for i in range(0, 4):
+                        ob.alertType = "giveup_challenge"    # 다음 플레이어가 4장 받는 알림창 띄우기
+                        for i in range(4):
                             shuffle_card(ob)
 
                             popCard = ob.unopenDeck.pop()
-                            ob.playerList[ob.nextTurn].append(popCard)
+                            ob.playerList[ob.myTurn].append(popCard)
                             ob.my_card_list.append(CardLoad(popCard))         # 카드 이미지 저장
-                            # 받은 이 카드들의 origin과 target 위치를 정해줄 코드 필요
+                            ob.my_card_list[len(ob.my_card_list) - 1].card_pop_image(ob.my_card_list)
                                     
-                        ai_color_change(ob)
-                        ob.playerTurn += ob.playDirection
-                        over_turn(ob) 
-                        ob.playerTurn += ob.playDirection   
-                        over_turn(ob)
-                        #ob.playerTurn += ob.playDirection * 2
+                    ai_color_change(ob)
+                    ob.playerTurn += ob.playDirection
+                    over_turn(ob) 
+                    ob.playerTurn += ob.playDirection   
+                    over_turn(ob)
             
     if ob.currentCard[1] == "Draw2":        #다음턴이 두장먹기
         Draw2(ob, cards)
@@ -173,12 +193,16 @@ def ai_color_change(ob):
 
 
 def stupid_ai(ob, cards):
-    ob.doubleWild = ob.currentCard[0]
-    ob.openDeck.append(ob.available.pop())     # 오픈덱에 컴퓨터가 낼 카드 더하기
-    ob.currentCard = pop(ob.openDeck)        # 오픈 덱의 첫번째 카드 저장
-    print("컴퓨터가 낸 카드: ", ob.currentCard)
-    cards.remove(ob.currentCard)        # 컴퓨터의 덱에 낸 카드는 삭제시키기
-    is_repeatedcard(ob, cards)
+    if ob.currentCard == ("Wild", "Draw4") :
+        pass
+    else :
+        ob.doubleWild = ob.currentCard[0]
+        ob.openDeck.append(ob.available.pop())     # 오픈덱에 컴퓨터가 낼 카드 더하기
+        ob.currentCard = pop(ob.openDeck)        # 오픈 덱의 첫번째 카드 저장
+        print("컴퓨터가 낸 카드: ", ob.currentCard)
+        cards.remove(ob.currentCard)        # 컴퓨터의 덱에 낸 카드는 삭제시키기
+        is_repeatedcard(ob, cards)
+
     ai_special_card(ob, cards)
     print("\n")
 
