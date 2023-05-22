@@ -9,11 +9,14 @@ from pygame_gui.elements import UITextEntryLine, UIButton
 from utility import resolution
 from client.networking import Networking
 from screens.abc_screen import Screen
+from tmp_game_screen import GameScreen
 
 
 class MapScreen(Screen):
     def __init__(self, surface: Surface, manager: pygame_gui.UIManager, networking: Networking):
         super().__init__(surface, manager, networking)
+
+        self.popup_window = None
 
         with open('display_config.json', 'r') as f:
             config_data = json.load(f)
@@ -35,15 +38,76 @@ class MapScreen(Screen):
 
         self.manager = manager
 
+        # 현재 도전중인 stage
+        with open('current_stage.json', 'r') as f:
+            self.current_stage_modify = json.load(f)
+
+        if self.current_stage_modify >= 4:
+            self.current_stage_modify = 0
+        self.current_stage = self.current_stage_modify
+        self.current_stage_modify += 1
+
+        with open('current_stage.json', 'w') as f:
+            json.dump(self.current_stage_modify, f)
+
+        # 스테이지 별 승리 상태
+        self.win_state1 = False
+        self.win_state2 = False
+        self.win_state3 = False
+        self.win_state4 = False
+        self.unlock_state1 = True
+        self.unlock_state2 = False
+        self.unlock_state3 = False
+        self.unlock_state4 = False
+
+        with open('win.json', 'r') as f:
+            win_value = json.load(f)
+        if win_value:
+            self.challenge()
+
+        with open('win.json', 'w') as f:
+            json.dump(False, f)
+
+        with open('unlock_state.json', 'r') as f:
+            unlock_state_json = json.load(f)
+
+        self.unlock_state = [unlock_state_json[str(
+            i)] for i in range(len(unlock_state_json))]
+
         # 이미지 로드
         self.image1 = pygame.image.load("assets/images/example1_inactive.png")
         self.image2 = pygame.image.load("assets/images/example1_active.png")
-        self.image3 = pygame.image.load("assets/images/example2_inactive.png")
-        self.image4 = pygame.image.load("assets/images/example2_active.png")
-        self.image5 = pygame.image.load("assets/images/example3_inactive.png")
-        self.image6 = pygame.image.load("assets/images/example3_active.png")
-        self.image7 = pygame.image.load("assets/images/example4_inactive.png")
-        self.image8 = pygame.image.load("assets/images/example4_active.png")
+        if not self.unlock_state[1]:
+            self.image3 = pygame.image.load(
+                "assets/images/example2_locked_inactive.png")
+            self.image4 = pygame.image.load(
+                "assets/images/example2_locked_active.png")
+        else:
+            self.image3 = pygame.image.load(
+                "assets/images/example2_inactive.png")
+            self.image4 = pygame.image.load(
+                "assets/images/example2_active.png")
+        if not self.unlock_state[2]:
+            self.image5 = pygame.image.load(
+                "assets/images/example3_locked_inactive.png")
+            self.image6 = pygame.image.load(
+                "assets/images/example3_locked_active.png")
+        else:
+            self.image5 = pygame.image.load(
+                "assets/images/example3_inactive.png")
+            self.image6 = pygame.image.load(
+                "assets/images/example3_active.png")
+        if not self.unlock_state[3]:
+            self.image7 = pygame.image.load(
+                "assets/images/example4_locked_inactive.png")
+            self.image8 = pygame.image.load(
+                "assets/images/example4_locked_active.png")
+        else:
+            self.image7 = pygame.image.load(
+                "assets/images/example4_inactive.png")
+            self.image8 = pygame.image.load(
+                "assets/images/example4_active.png")
+
         self.image9 = pygame.image.load("assets/images/example5-1.png")
         self.image10 = pygame.image.load("assets/images/example5-2.png")
         self.image11 = pygame.image.load("assets/images/example5-3.png")
@@ -122,7 +186,23 @@ class MapScreen(Screen):
         self.home_button = UIButton(
             relative_rect=self.button_rect, text='HOME', manager=manager)
 
+    def challenge(self):
+        with open("win_state.json", "r") as f:
+            win_state_json = json.load(f)
+        win_state_json[str(self.current_stage - 1)] = True
+
+        with open("win_state.json", "w") as f:
+            json.dump(win_state_json, f)
+
+        with open("unlock_state.json", "r") as f:
+            unlock_state_json = json.load(f)
+        unlock_state_json[str(self.current_stage)] = True
+
+        with open("unlock_state.json", "w") as f:
+            json.dump(unlock_state_json, f)
+
     # 팝업창 함수
+
     def create_popup(self, manager):
         popup_window = pygame_gui.windows.UIConfirmationDialog(
             rect=pygame.Rect(
@@ -132,6 +212,14 @@ class MapScreen(Screen):
             action_long_desc='Are you sure to play Stage 1?',
             action_short_name='OK',
             blocking=True)
+
+        def handle_confirmation_action():
+            print('stage1에 진입했습니다.')
+            self.next_screen = GameScreen
+            self.is_running = False
+
+        popup_window.confirm_button.on_click = handle_confirmation_action()
+
         return popup_window
 
     def create_popup2(self, manager):
@@ -143,6 +231,14 @@ class MapScreen(Screen):
             action_long_desc='Are you sure to play Stage 2?',
             action_short_name='OK',
             blocking=True)
+
+        def handle_confirmation_action():
+            print('stage2에 진입했습니다.')
+            self.next_screen = GameScreen
+            self.is_running = False
+
+        popup_window.confirm_button.on_click = handle_confirmation_action()
+
         return popup_window
 
     def create_popup3(self, manager):
@@ -154,6 +250,14 @@ class MapScreen(Screen):
             action_long_desc='Are you sure to play Stage 3?',
             action_short_name='OK',
             blocking=True)
+
+        def handle_confirmation_action():
+            print('stage3에 진입했습니다.')
+            self.next_screen = GameScreen
+            self.is_running = False
+
+        popup_window.confirm_button.on_click = handle_confirmation_action()
+
         return popup_window
 
     def create_popup4(self, manager):
@@ -165,6 +269,14 @@ class MapScreen(Screen):
             action_long_desc='Are you sure to play Stage 4?',
             action_short_name='OK',
             blocking=True)
+
+        def handle_confirmation_action():
+            print('stage4에 진입했습니다.')
+            self.next_screen = GameScreen
+            self.is_running = False
+
+        popup_window.confirm_button.on_click = handle_confirmation_action()
+
         return popup_window
 
     def handle_event(self, event):
@@ -232,21 +344,37 @@ class MapScreen(Screen):
                     self.current_image2 = self.image3
                     self.current_image3 = self.image5
                     self.current_image = self.image1
+                    self.show_text4 = True
+                    self.show_text2 = False
+                    self.show_text3 = False
+                    self.show_text1 = False
                 elif self.selected_index == 1:
                     self.current_image = self.image2
                     self.current_image2 = self.image3
                     self.current_image3 = self.image5
                     self.current_image4 = self.image7
+                    self.show_text1 = True
+                    self.show_text3 = False
+                    self.show_text2 = False
+                    self.show_text4 = False
                 elif self.selected_index == 2:
                     self.current_image2 = self.image4
                     self.current_image = self.image1
                     self.current_image3 = self.image5
                     self.current_image4 = self.image7
+                    self.show_text2 = True
+                    self.show_text4 = False
+                    self.show_text1 = False
+                    self.show_text3 = False
                 elif self.selected_index == 3:
                     self.current_image3 = self.image6
                     self.current_image2 = self.image3
                     self.current_image = self.image1
                     self.current_image4 = self.image7
+                    self.show_text3 = True
+                    self.show_text2 = False
+                    self.show_text1 = False
+                    self.show_text4 = False
 
             elif event.key == self.keyboard_right:
                 self.selected_index = (
@@ -256,21 +384,37 @@ class MapScreen(Screen):
                     self.current_image2 = self.image3
                     self.current_image3 = self.image5
                     self.current_image = self.image1
+                    self.show_text4 = True
+                    self.show_text1 = False
+                    self.show_text3 = False
+                    self.show_text2 = False
                 elif self.selected_index == 1:
                     self.current_image = self.image2
                     self.current_image2 = self.image3
                     self.current_image3 = self.image5
                     self.current_image4 = self.image7
+                    self.show_text1 = True
+                    self.show_text2 = False
+                    self.show_text3 = False
+                    self.show_text4 = False
                 elif self.selected_index == 2:
                     self.current_image2 = self.image4
                     self.current_image = self.image1
                     self.current_image3 = self.image5
                     self.current_image4 = self.image7
+                    self.show_text2 = True
+                    self.show_text1 = False
+                    self.show_text3 = False
+                    self.show_text4 = False
                 elif self.selected_index == 3:
                     self.current_image3 = self.image6
                     self.current_image2 = self.image3
                     self.current_image = self.image1
                     self.current_image4 = self.image7
+                    self.show_text3 = True
+                    self.show_text1 = False
+                    self.show_text2 = False
+                    self.show_text4 = False
 
             elif event.key == pygame.K_RETURN:
                 if self.selected_index == 0:
@@ -306,17 +450,26 @@ class MapScreen(Screen):
         if self.current_image2 == self.image4:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN:
-                    self.popup_window = self.create_popup2(self.manager)
+                    if self.unlock_state[1] == False:
+                        pass
+                    else:
+                        self.popup_window = self.create_popup2(self.manager)
 
         if self.current_image3 == self.image6:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN:
-                    self.popup_window = self.create_popup3(self.manager)
+                    if self.unlock_state[2] == False:
+                        pass
+                    else:
+                        self.popup_window = self.create_popup3(self.manager)
 
         if self.current_image4 == self.image8:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN:
-                    self.popup_window = self.create_popup4(self.manager)
+                    if self.unlock_state[3] == False:
+                        pass
+                    else:
+                        self.popup_window = self.create_popup4(self.manager)
 
         if event.type == pygame.USEREVENT:
             if self.popup_window and event.type == pygame_gui.UI_CONFIRMATION_DIALOG_CONFIRMED:
@@ -326,11 +479,18 @@ class MapScreen(Screen):
 
         if event.type == pygame_gui.UI_BUTTON_PRESSED:
             if event.ui_element == self.home_button:
+                with open('current_stage.json', 'r') as f:
+                    self.current_stage_modify = json.load(f)
+                self.current_stage_modify = 0
+
+                with open('current_stage.json', 'w') as f:
+                    json.dump(self.current_stage_modify, f)
                 from screens.start_screen import StartScreen
                 self.next_screen = StartScreen
                 self.is_running = False
 
  # run 함수
+
     def run(self, events: list[Event]) -> bool:
 
         self.screen.blit(self.background, (0, 0))
