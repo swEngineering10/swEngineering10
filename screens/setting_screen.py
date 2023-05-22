@@ -29,6 +29,9 @@ class SettingScreen(Screen):
         self.data = {"resolution": {
             "width": self.screen_width, "height": self.screen_height}}
 
+        with open("volume_setting.json", "r") as f:
+            self.volume_data = json.load(f)
+
         # 폰트 설정
         self.font = pygame.font.SysFont(None, 100)
         self.uni_font = pygame.font.SysFont(None, 30)
@@ -93,6 +96,11 @@ class SettingScreen(Screen):
         self.volume_button = UIButton(
             relative_rect=self.button_rect3, text="Volume", manager=manager)
 
+    def update_volume(self):
+        self.bgm_volume = (
+            self.volume_data["slider1_value"] * self.volume_data["slider2_value"]) / 100.0
+        pygame.mixer.music.set_volume(self.bgm_volume)
+
     # 이벤트 처리 함수
     def handle_event(self, event):
         # 드롭다운 메뉴 이벤트
@@ -124,6 +132,21 @@ class SettingScreen(Screen):
                     json.dump(self.data, f)
                 self.next_screen = SettingScreen
                 self.is_running = False
+
+                with open('keys.json', 'r') as f:
+                    keyboard_data = json.load(f)
+                keyboard_data["1073741906"] = 1073741906
+                keyboard_data["1073741905"] = 1073741905
+                keyboard_data["1073741904"] = 1073741904
+                keyboard_data["1073741903"] = 1073741903
+                with open('keys.json', 'w') as f:
+                    json.dump(keyboard_data, f)
+
+                self.data = {"slider1_value": 0.5,
+                             "slider2_value": 50, "slider3_value": 50}
+                with open("volume_setting.json", "w") as f:
+                    json.dump(self.data, f)
+
             elif event.ui_element == self.keyboard_button:
                 self.next_screen = KeyScreen
                 self.is_running = False
@@ -149,6 +172,8 @@ class SettingScreen(Screen):
 
         for event in events:
             self.handle_event(event)
+
+        self.update_volume()
 
         if self.networking.current_game.is_started:
             self.is_running = False
