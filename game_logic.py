@@ -159,10 +159,15 @@ def play_game(ob, cards):
 
                 is_repeatedcard(ob, cards)
                 special_card(ob, cards)
-                set_turn(ob)
+                set_turn(ob)                         # 턴이 넘어감
 
-                if ob.currentCard[0] != "Wild" :
+                if ob.currentCard[0] != "Wild" :     # Wild라면 special_card() 함수 계속 돌아야 하므로 False
                     ob.isCardPlayed = False
+
+                if ob.currentCard[1] == "Skip" :
+                    ob.alertType = "skip"
+                elif ob.currentCard[1] == "Reverse" :
+                    ob.alertType = "direction_change"
 
             ob.turnCount += 1
             
@@ -201,10 +206,6 @@ def play_game(ob, cards):
                 set_turn(ob)
 
             ob.turnCount += 1
-
-    # current card 저장
-
-    # 상대방 플레이어 카드 개수 갱신
 
 
 #중복 카드 검사
@@ -246,21 +247,53 @@ def special_card(ob, cards):
             color_change(ob)
             
         if ob.currentCard[1] == "Swap":
-            swapedPlayer= int(input("몇번째 플레이어와 카드를 바꾸겠습니까?"))
-            ob.playerList[ob.playerTurn], ob.playerList[swapedPlayer] = ob.playerList[swapedPlayer], ob.playerList[ob.playerTurn]
-            color_change(ob)
+            ob.currentPopup = "is_swap"   # 스왑 팝업창 띄우기
+            if ob.IsSwap != None :  # 스왑 여부 버튼 누르기 전까지 다음 턴 X
+
+                # 바꾸기 누른 경우
+                if ob.IsSwap == True :
+                    ob.currentPopup = "select_swap"    # 스왑 플레이어 선택 팝업창 띄우기
+                    if ob.swapNumber != None :  # 스왑할 플레이어 버튼 누르기 전까지 다음 턴 X
+                        swapedPlayer = ob.swapNumber
+
+                        # 아래는 한번만 실행 (아닐 경우 루프 돌면서 계속 서로 스왑)
+                        if ob.isUnChecked2 :
+                            ob.A += 1
+                            # 스왑
+                            ob.playerList[ob.playerTurn], ob.playerList[swapedPlayer] = ob.playerList[swapedPlayer], ob.playerList[ob.playerTurn]
+                            
+                            # 내 이미지 갱신
+                            # 카드 리스트 초기화
+                            ob.my_card_list = []
+                            for i in range(len(ob.playerList[ob.playerTurn])) :
+                                ob.my_card_list.append(CardLoad(ob.playerList[ob.playerTurn][i]))
+                                ob.my_card_list[i].swap_card_pop_image(ob.my_card_list)
+
+                            ob.alertType = "swap"       # 스왑 알림창 띄우기
+                            ob.isUnChecked2 = False
+
+                        # 상대방 카드 이미지 갱신
+                        ob.player_deck_image_list[swapedPlayer - 1].player_card_num = len(ob.playerList[swapedPlayer])
+
+                        color_change(ob)
+
+                # 바꾸기 누르지 않은 경우 swapedPlayer에 0 전달하기 (자기 자신과 스왑)
+                elif ob.IsSwap == False : 
+                    swapedPlayer = 0
+                    ob.playerList[ob.playerTurn], ob.playerList[swapedPlayer] = ob.playerList[swapedPlayer], ob.playerList[ob.playerTurn]
+                    color_change(ob)
         
+
         if ob.currentCard[1] == "Draw4":
 
             # Draw4 공격 시 color_change 외 코드는 한 번만 실행
             if ob.isUnChecked :
-                
-                print(ob.playerList[ob.myTurn])
 
                 challenge = randint(0, 1)       #ai가 공격할 것인가?
                 next_turn(ob)   #다음턴 사람은 누구인가?
                 
                 if challenge==1:        #공격시
+
                     Draw4(ob, cards)
 
                 else:       #도전 자체를 하지 않는다면?
@@ -281,30 +314,31 @@ def special_card(ob, cards):
                 
         
 def Draw4(ob, cards):
-    print("다음턴인", ob.nextTurn,"이 도전합니다!")
+    # print("다음턴인", ob.nextTurn,"이 도전합니다!")
     is_challenge = 0    #is_challenge: 0이면 공격 실패
     for i in cards:
         if i[0] == ob.doubleWild:
             is_challenge = 1
             
-    if is_challenge==1:     #다음플레이어가 현재턴에게 공격 성공했다면
-        print(ob.doubleWild,"와 같은 색상 카드를 가지고 있었습니다! 공격성공!")
-        print("현재 플레이어인 ", ob.playerTurn, "이 4장을 먹습니다!")
+    if is_challenge==1:     # 다음플레이어가 현재턴에게 공격 성공했다면
+        ob.alertType = "success_challenge"      # 공격 성공 알림창 띄우기
         for i in range(0, 4):
             shuffle_card(ob)
             popCard = ob.unopenDeck.pop()
             ob.playerList[ob.playerTurn].append(popCard)    # 본인이 4장 먹음
             if ob.plyerTurn == ob.myTurn :                  # 그 사람이 나면 이미지 추가
                 ob.my_card_list.append(CardLoad(popCard))
-    else:       #컴퓨터가 나에게 공격 실패했다면
-        print(ob.doubleWild,"와 같은 색상 카드가 없었습니다! 공격실패!")
-        print("도전에 실패하였습니다! 다음 플레이어인", ob.nextTurn," 이 6장을 먹습니다!")
+                ob.my_card_list[i].card_pop_image(ob.my_card_list)
+
+    else:       # 공격 실패했다면
+        ob.alertType = "fail_challenge"      # 공격 실패 알림창 띄우기
         for i in range(0, 6):
             shuffle_card(ob)
             popCard = ob.unopenDeck.pop()
             ob.playerList[ob.nextTurn].append(popCard)        # 다음턴이 6장 먹음
             if ob.nextTurn == ob.myTurn :                                 # 그 사람이 나면 이미지 추가
                 ob.my_card_list.append(CardLoad(popCard))
+                ob.my_card_list[i].card_pop_image(ob.my_card_list)
         
         
 #다음턴이 두장먹기
@@ -346,25 +380,23 @@ def color_change(ob):
         # currentCard의 색깔 바꾸기
         if ob.currentCard[1] == "Color_Change" :
             ob.currentCard = (ob.cardColor[newColour-1], "Color_Change")
-            # ob.current_card_image = pygame.image.load(f"assets/images/cards/{ob.cardColor[newColour-1]}_Color_Change.png")
-            ob.current_card_image = CardLoad((ob.cardColor[newColour-1], "Color_Change"))
-            ob.isColorChanged = True
+            ob.current_card_image.image = pygame.image.load(f"assets/images/cards/{ob.cardColor[newColour-1]}_Color_Change.png")
         elif ob.currentCard[1] == "Draw4" :
             ob.currentCard = (ob.cardColor[newColour-1], "Draw4")
-            # ob.current_card_image = pygame.image.load(f"assets/images/cards/{ob.cardColor[newColour-1]}_Draw4.png") 
-            ob.current_card_image = CardLoad((ob.cardColor[newColour-1], "Draw4"))
-            ob.isColorChanged = True
+            ob.current_card_image.image = pygame.image.load(f"assets/images/cards/{ob.cardColor[newColour-1]}_Draw4.png")
         elif ob.currentCard[1] == "Swap" : 
             ob.currentCard = (ob.cardColor[newColour-1], "Swap")
-            # ob.current_card_image = pygame.image.load(f"assets/images/cards/{ob.cardColor[newColour-1]}_Swap.png") 
-            ob.current_card_image = CardLoad((ob.cardColor[newColour-1], "Swap"))
-            ob.isColorChanged = True
+            ob.current_card_image.image = pygame.image.load(f"assets/images/cards/{ob.cardColor[newColour-1]}_Swap.png")
 
-        print(ob.cardColor[newColour-1],"라는 색깔을 선택합니다!")
+        ob.alertType = "color_change"
         ob.currentPopup = None  # 팝업 닫기
-        ob.selectedColor = None # 선택 컬러 None으로 바꾸기
+
+        # 아래는 변수 원상복구
+        ob.selectedColor = None
         ob.isCardPlayed = False # 카드 냄 (더이상 play_game 반복 X)
-        ob.isUnChecked = True   # 변수 원상복귀
+        ob.isUnChecked = True
+        ob.isUnChecked2 = True
+        ob.IsSwap == None
         ob.isColorChanged = False
 
         ob.playerTurn += ob.playDirection
@@ -388,6 +420,8 @@ def set_turn(ob):
             ob.playerTurn += ob.playDirection
             over_turn(ob)
         elif ob.currentCard[1] == "Skip" or ob.openDeck[1][-1] == "Draw4":
+            if ob.currentCard[1] == "Skip" :
+                ob.alertType = "direction_change"
             print("다다음 턴으로 넘어갑니다!")
             ob.playerTurn += ob.playDirection * 2
             over_turn(ob)
