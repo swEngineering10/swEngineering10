@@ -23,8 +23,8 @@ class ModeScreen(Screen):
         with open('keys.json', 'r') as f:
             keyboard_data = json.load(f)
 
-        self.key_up = keyboard_data["keyboard"]["up"]
-        self.key_down = keyboard_data["keyboard"]["down"]
+        self.key_up = keyboard_data["1073741906"]
+        self.key_down = keyboard_data["1073741905"]
 
         self.background = pygame.Surface(WINDOW_SIZE)
         self.screen = pygame.display.set_mode((WINDOW_SIZE))
