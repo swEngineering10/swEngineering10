@@ -12,6 +12,8 @@ from screens.abc_screen import Screen
 from screens.lobby_screen import LobbyScreen
 from screens.setting_screen import SettingScreen
 from screens.mode_screen import ModeScreen
+from network_server import Server
+from screens.role_screen import RoleScreen
 
 
 class StartScreen(Screen):
@@ -63,14 +65,21 @@ class StartScreen(Screen):
         self.text5_rect = self.text5.get_rect(
             center=(self.screen_width // 2 * 0.3, self.screen_height * 0.95))
         # 버튼 생성
-        self.button1 = pygame_gui.elements.UIButton(relative_rect=pygame.Rect(
-            self.screen_width // 2 - 100, self.screen_height // 2, 200, 50), text='SINGLE PLAY', manager=manager)
-        self.button2 = pygame_gui.elements.UIButton(relative_rect=pygame.Rect(
-            self.screen_width // 2 - 100, self.screen_height // 2 * 1.3, 200, 50), text='SETTING', manager=manager)
-        self.button3 = pygame_gui.elements.UIButton(relative_rect=pygame.Rect(
-            self.screen_width // 2 - 100, self.screen_height // 2 * 1.6, 200, 50), text='EXIT', manager=manager)
+        self.button_width = 200
+        self.button_height = 50
+        self.button_margin = 10
+        self.button_start_y = self.screen_height // 2
 
-        buttons = [self.button1, self.button2, self.button3]
+        self.button1 = pygame_gui.elements.UIButton(relative_rect=pygame.Rect(
+            self.screen_width // 2 - self.button_width // 2, self.button_start_y, self.button_width, self.button_height), text='SINGLE PLAY', manager=manager)
+        self.button2 = pygame_gui.elements.UIButton(relative_rect=pygame.Rect(
+            self.screen_width // 2 - self.button_width // 2, self.button_start_y + self.button_height + self.button_margin, self.button_width, self.button_height), text='MULTIPLAYER', manager=manager)
+        self.button3 = pygame_gui.elements.UIButton(relative_rect=pygame.Rect(
+            self.screen_width // 2 - self.button_width // 2, self.button_start_y + (self.button_height + self.button_margin) * 2, self.button_width, self.button_height), text='SETTINGS', manager=manager)
+        self.button4 = pygame_gui.elements.UIButton(relative_rect=pygame.Rect(
+            self.screen_width // 2 - self.button_width // 2, self.button_start_y + (self.button_height + self.button_margin) * 3, self.button_width, self.button_height), text='EXIT', manager=manager)
+
+        buttons = [self.button1, self.button2, self.button3, self.button4]
 
         self.buttons = buttons
         self.selected_button_index = 0
@@ -78,6 +87,10 @@ class StartScreen(Screen):
 
     def play_mode_function(self):
         self.next_screen = ModeScreen
+        self.is_running = False
+
+    def multiplayer_mode_function(self):
+        self.next_screen = RoleScreen
         self.is_running = False
 
     def setting_mode_function(self):
@@ -113,6 +126,8 @@ class StartScreen(Screen):
                 if clicked_button == self.button1:
                     self.play_mode_function()
                 elif clicked_button == self.button2:
+                    self.multiplayer_mode_function()
+                elif clicked_button == self.button3:
                     self.setting_mode_function()
                 else:
                     self.exit_mode_function()
@@ -122,6 +137,8 @@ class StartScreen(Screen):
                     if button == self.button1:
                         self.play_mode_function()
                     elif button == self.button2:
+                        self.multiplayer_mode_function()
+                    elif button == self.button3:
                         self.setting_mode_function()
                     else:
                         self.exit_mode_function()

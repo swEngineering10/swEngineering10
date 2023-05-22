@@ -20,6 +20,12 @@ from screens.setting_screen import SettingScreen
 from screens.keysetting_screen import KeyScreen
 from screens.map_screen import MapScreen
 from screens.client_lobby import ClientLobby
+<<<<<<< Updated upstream
+=======
+from tmp_game_screen import GameScreen
+from network_client import Client
+from network_server import Server
+>>>>>>> Stashed changes
 
 from utilities.image_utility import load_image
 from utilities.text_utility import truncate
@@ -85,7 +91,11 @@ def main():
     fps = 120
     clock = pygame.time.Clock()
 
+<<<<<<< Updated upstream
     current_screen = MainScreen(screen, manager, networking)
+=======
+    current_screen = VolumeScreen(screen, manager, networking)
+>>>>>>> Stashed changes
 
     # 인증 부분
     '''
