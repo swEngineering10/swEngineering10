@@ -187,7 +187,7 @@ def play_game(ob, cards):
                     shuffle_card(ob)
                     popCard = ob.unopenDeck.pop()
                     ob.playerList[ob.playerTurn].append(popCard)    # 카드 리스트에 저장
-                    ob.my_card_list.append(CardLoad(popCard))       # 카드 이이미지 리스트에 저장
+                    ob.my_card_list.append(CardLoad(popCard))       # 카드 이미지 리스트에 저장
                 print("방어 실패! ",ob.playerTurn,"번째 플레이어가", ob.Draw2Count * 2,"장을 먹습니다")
 
                 set_turn(ob)
@@ -258,7 +258,6 @@ def special_card(ob, cards):
 
                         # 아래는 한번만 실행 (아닐 경우 루프 돌면서 계속 서로 스왑)
                         if ob.isUnChecked2 :
-                            ob.A += 1
                             # 스왑
                             ob.playerList[ob.playerTurn], ob.playerList[swapedPlayer] = ob.playerList[swapedPlayer], ob.playerList[ob.playerTurn]
                             
@@ -287,24 +286,22 @@ def special_card(ob, cards):
         if ob.currentCard[1] == "Draw4":
 
             # Draw4 공격 시 color_change 외 코드는 한 번만 실행
-            if ob.isUnChecked :
+            if ob.isUnChecked3 :
 
                 challenge = randint(0, 1)       #ai가 공격할 것인가?
                 next_turn(ob)   #다음턴 사람은 누구인가?
                 
                 if challenge==1:        #공격시
-
                     Draw4(ob, cards)
-
-                else:       #도전 자체를 하지 않는다면?
-                    print("다음턴이 4장을 먹습니다!")
+                else:                   #도전 자체를 하지 않는다면?
+                    ob.alertType = "giveup_challenge"   # 팝업 띄우기
                     for i in range(0, 4):
                         shuffle_card(ob)
                         ob.playerList[ob.nextTurn].append(ob.unopenDeck.pop())        #다음턴이 4장 먹음
 
-                ob.isUnChecked = False
+                ob.isUnChecked3 = False
 
-            color_change(ob)  
+            color_change(ob)
                
     if ob.currentCard[1] == "Draw2":        #다음턴이 두장먹기
         Draw2(ob, cards)
@@ -314,7 +311,6 @@ def special_card(ob, cards):
                 
         
 def Draw4(ob, cards):
-    # print("다음턴인", ob.nextTurn,"이 도전합니다!")
     is_challenge = 0    #is_challenge: 0이면 공격 실패
     for i in cards:
         if i[0] == ob.doubleWild:
@@ -326,9 +322,9 @@ def Draw4(ob, cards):
             shuffle_card(ob)
             popCard = ob.unopenDeck.pop()
             ob.playerList[ob.playerTurn].append(popCard)    # 본인이 4장 먹음
-            if ob.plyerTurn == ob.myTurn :                  # 그 사람이 나면 이미지 추가
+            if ob.playerTurn == ob.myTurn :                  # 그 사람이 나면 이미지 추가
                 ob.my_card_list.append(CardLoad(popCard))
-                ob.my_card_list[i].card_pop_image(ob.my_card_list)
+                ob.my_card_list[len(ob.my_card_list) - 1].card_pop_image(ob.my_card_list)
 
     else:       # 공격 실패했다면
         ob.alertType = "fail_challenge"      # 공격 실패 알림창 띄우기
@@ -338,7 +334,7 @@ def Draw4(ob, cards):
             ob.playerList[ob.nextTurn].append(popCard)        # 다음턴이 6장 먹음
             if ob.nextTurn == ob.myTurn :                                 # 그 사람이 나면 이미지 추가
                 ob.my_card_list.append(CardLoad(popCard))
-                ob.my_card_list[i].card_pop_image(ob.my_card_list)
+                ob.my_card_list[len(ob.my_card_list) - 1].card_pop_image(ob.my_card_list)
         
         
 #다음턴이 두장먹기
@@ -384,6 +380,8 @@ def color_change(ob):
         elif ob.currentCard[1] == "Draw4" :
             ob.currentCard = (ob.cardColor[newColour-1], "Draw4")
             ob.current_card_image.image = pygame.image.load(f"assets/images/cards/{ob.cardColor[newColour-1]}_Draw4.png")
+            ob.playerTurn += ob.playDirection * 2
+            over_turn(ob)         
         elif ob.currentCard[1] == "Swap" : 
             ob.currentCard = (ob.cardColor[newColour-1], "Swap")
             ob.current_card_image.image = pygame.image.load(f"assets/images/cards/{ob.cardColor[newColour-1]}_Swap.png")
@@ -394,8 +392,10 @@ def color_change(ob):
         # 아래는 변수 원상복구
         ob.selectedColor = None
         ob.isCardPlayed = False # 카드 냄 (더이상 play_game 반복 X)
+        ob.isUnChecked0 = True
         ob.isUnChecked = True
         ob.isUnChecked2 = True
+        ob.isUnChecked3 = True
         ob.IsSwap == None
         ob.isColorChanged = False
 
@@ -419,13 +419,12 @@ def set_turn(ob):
         elif len(ob.openDeck) == 0:
             ob.playerTurn += ob.playDirection
             over_turn(ob)
-        elif ob.currentCard[1] == "Skip" or ob.openDeck[1][-1] == "Draw4":
-            if ob.currentCard[1] == "Skip" :
-                ob.alertType = "direction_change"
+        elif ob.currentCard[1] == "Skip":
             print("다다음 턴으로 넘어갑니다!")
             ob.playerTurn += ob.playDirection * 2
-            over_turn(ob)
-        elif (ob.currentCard[1] != "Color_Change") & (ob.currentCard[1] != "Swap") & (ob.currentCard[1] != "All_In") :
+            
+            over_turn(ob)         
+        elif (ob.currentCard[1] != "Color_Change") & (ob.currentCard[1] != "Swap") & (ob.currentCard[1] != "All_In") & (ob.currentCard[1] != "Draw4") :
             ob.playerTurn += ob.playDirection
             over_turn(ob)
     except IndexError:

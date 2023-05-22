@@ -172,9 +172,9 @@ class PopupTextButton():
     def on_click(self, game_init):
         # 챌린지 팝업 버튼
         if self.text == "챌린지" :
-            game_init.IsChallenge = 0
-        elif self.text == "포기" :
             game_init.IsChallenge = 1
+        elif self.text == "포기" :
+            game_init.IsChallenge = 0
 
         # 스왑 팝업 버튼
         elif self.text == "스왑" :
