@@ -10,6 +10,8 @@ from utility import resolution
 from client.networking import Networking
 from screens.abc_screen import Screen
 from screens.volume_screen import VolumeScreen
+from screens.keysetting_screen import KeyScreen
+
 
 class SettingScreen(Screen):
     def __init__(self, surface: Surface, manager: pygame_gui.UIManager, networking: Networking):
@@ -24,26 +26,34 @@ class SettingScreen(Screen):
         self.next_screen = VolumeScreen
 
         # 딕셔너리 생성
-        self.data = {"resolution": {"width": self.screen_width, "height": self.screen_height}}
+        self.data = {"resolution": {
+            "width": self.screen_width, "height": self.screen_height}}
+
+        with open("volume_setting.json", "r") as f:
+            self.volume_data = json.load(f)
 
         # 폰트 설정
         self.font = pygame.font.SysFont(None, 100)
         self.uni_font = pygame.font.SysFont(None, 30)
-        
+
         # 텍스트 생성
         self.text_setting = self.font.render("SETTING", True, (255, 255, 255))
-        self.text_resolution = self.uni_font.render("Resolution", True, (255, 255, 255))
-        self.text_colorchange = self.uni_font.render("Color Change", True, (255, 255, 255))
-        self.text_keysetting = self.uni_font.render("Keyboard Setting", True, (255, 255, 255))
-        
+        self.text_resolution = self.uni_font.render(
+            "Resolution", True, (255, 255, 255))
+        self.text_colorchange = self.uni_font.render(
+            "Color Change", True, (255, 255, 255))
+        self.text_keysetting = self.uni_font.render(
+            "Keyboard Setting", True, (255, 255, 255))
+
         # 텍스트의 높이와 너비 구하기
-        self.text_setting_rect = self.text_setting.get_rect(center=(self.screen_width//2, self.screen_height//2 * 0.5))
+        self.text_setting_rect = self.text_setting.get_rect(
+            center=(self.screen_width//2, self.screen_height//2 * 0.5))
         self.text_resolution_rect = self.text_resolution.get_rect(
             center=(self.screen_width // 2 * 0.5, self.screen_height // 2))
         self.text_colorchange_rect = self.text_colorchange.get_rect(
             center=(self.screen_width // 2 * 0.5, self.screen_height // 2 * 1.3))
         self.text_keysetting_rect = self.text_keysetting.get_rect(
-            center=(self.screen_width // 2 * 0.5, self.screen_height // 2 * 1.6))  
+            center=(self.screen_width // 2 * 0.5, self.screen_height // 2 * 1.6))
 
         # 화면 해상도 드롭다운 메뉴 생성
         self.resolution_menu = pygame_gui.elements.UIDropDownMenu(
@@ -62,14 +72,11 @@ class SettingScreen(Screen):
                 (self.screen_width // 2 * 1.1, self.screen_height // 2 * 1.2), (self.screen_width // 5, self.screen_height // 15)),
             manager=manager)
 
-        # 키보드 설정 변경 드롭다운 메뉴 생성
-        self.keyboard_menu = pygame_gui.elements.UIDropDownMenu(
-            options_list=["↑, ↓, ←, →", "W, S, A, D"],
-            starting_option="↑, ↓, ←, →",
-            relative_rect=pygame.Rect(
-                (self.screen_width // 2 * 1.1, self.screen_height // 2 * 1.5), (self.screen_width // 5, self.screen_height // 15)),
-            manager=manager
-        )
+        # 키보드 설정 변경 버튼 생성
+        self.keyboard_button_rect = pygame.Rect(
+            (self.screen_width // 2 * 1.1, self.screen_height // 2 * 1.5), (self.screen_width // 5, self.screen_height // 15))
+        self.keyboard_button = UIButton(
+            relative_rect=self.keyboard_button_rect, text='Keyboard Setting', manager=manager)
 
         # 리셋버튼 생성
         self.button_rect = pygame.Rect(
@@ -88,6 +95,11 @@ class SettingScreen(Screen):
             (self.screen_width // 2 * 0.85, self.screen_height // 2 * 1.8), (self.screen_width // 5, self.screen_height // 15))
         self.volume_button = UIButton(
             relative_rect=self.button_rect3, text="Volume", manager=manager)
+
+    def update_volume(self):
+        self.bgm_volume = (
+            self.volume_data["slider1_value"] * self.volume_data["slider2_value"]) / 100.0
+        pygame.mixer.music.set_volume(self.bgm_volume)
 
     # 이벤트 처리 함수
     def handle_event(self, event):
@@ -121,6 +133,24 @@ class SettingScreen(Screen):
                 self.next_screen = SettingScreen
                 self.is_running = False
 
+                with open('keys.json', 'r') as f:
+                    keyboard_data = json.load(f)
+                keyboard_data["1073741906"] = 1073741906
+                keyboard_data["1073741905"] = 1073741905
+                keyboard_data["1073741904"] = 1073741904
+                keyboard_data["1073741903"] = 1073741903
+                with open('keys.json', 'w') as f:
+                    json.dump(keyboard_data, f)
+
+                self.data = {"slider1_value": 0.5,
+                             "slider2_value": 50, "slider3_value": 50}
+                with open("volume_setting.json", "w") as f:
+                    json.dump(self.data, f)
+
+            elif event.ui_element == self.keyboard_button:
+                self.next_screen = KeyScreen
+                self.is_running = False
+
             elif event.ui_element == self.volume_button:
                 self.next_screen = VolumeScreen
                 self.is_running = False
@@ -133,7 +163,7 @@ class SettingScreen(Screen):
 
      # run 함수
     def run(self, events: list[Event]) -> bool:
-        
+
         self.screen.blit(self.background, (0, 0))
         self.screen.blit(self.text_setting, self.text_setting_rect)
         self.screen.blit(self.text_resolution, self.text_resolution_rect)
@@ -142,6 +172,8 @@ class SettingScreen(Screen):
 
         for event in events:
             self.handle_event(event)
+
+        self.update_volume()
 
         if self.networking.current_game.is_started:
             self.is_running = False

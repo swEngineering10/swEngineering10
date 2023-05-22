@@ -9,6 +9,11 @@ from utility import resolution
 from client.networking import Networking
 from screens.abc_screen import Screen
 
+from setting_class import *
+
+ess = Setting()
+
+
 class LobbyScreen(Screen):
     def __init__(self, surface: Surface, manager: pygame_gui.UIManager, networking: Networking):
         super().__init__(surface, manager, networking)
