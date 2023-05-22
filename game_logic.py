@@ -25,7 +25,7 @@ def init(ob) :      #게임 초기화 함수
     start_card(ob)
     
     #카드 실험용으로 넣은거임!
-    #ob.playerList[ob.myTurn].append(("Wild", "Draw4"))
+    ob.playerList[ob.myTurn].append(("Red", "All_in"))
 
 
 def split_cards(ob):    # 카드 7장씩 나누어주기

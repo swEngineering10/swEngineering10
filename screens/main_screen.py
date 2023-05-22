@@ -28,6 +28,18 @@ from game_class import GameInit
 from client.networking import Networking
 from screens.abc_screen import Screen
 
+with open("setting_text.txt", "r") as file:
+    for line in file:
+        key, value = line.strip().split(":")
+        if key == "computer_number":
+            computer_number = value.strip()
+        elif key == "user_name":
+            user_name = value.strip()
+
+print("computer_number : ", computer_number)
+print("user_name : ", user_name)
+
+
 class MainScreen(Screen):
     def __init__(self, surface: Surface, manager: pygame_gui.UIManager, networking: Networking):
         super().__init__(surface, manager, networking)
