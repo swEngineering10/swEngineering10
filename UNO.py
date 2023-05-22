@@ -92,7 +92,7 @@ def main():
     fps = 120
     clock = pygame.time.Clock()
 
-    current_screen = Achievement(screen, manager, networking)
+    current_screen = MainScreen(screen, manager, networking)
 
     # 인증 부분
     '''

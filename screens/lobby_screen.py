@@ -9,6 +9,7 @@ from utility import resolution
 from client.networking import Networking
 from screens.abc_screen import Screen
 
+
 class LobbyScreen(Screen):
     def __init__(self, surface: Surface, manager: pygame_gui.UIManager, networking: Networking):
         super().__init__(surface, manager, networking)
@@ -135,6 +136,9 @@ class LobbyScreen(Screen):
                 else :
                     self.user_name = self.username_entry.get_text()
                 print(self.user_name)
+                with open("setting_text.txt", "w") as file:
+                    file.write(f"computer_number:{self.computer_number}\n")
+                    file.write(f"user_name:{self.user_name}\n")
                 # self.next_screen = MainScreen
                 # self.is_running = False
 

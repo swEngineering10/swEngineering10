@@ -14,6 +14,10 @@ from game_logic import init
 from game_logic import split_cards
 from game_logic import play_game
 from game_logic import game_end
+from game_logic import load_achievements
+from game_logic import save_achievements
+from game_logic import update_achievement
+
 from AIplayer import ai_play_game
 from utility import resolution
 from utility import handle_click_card
@@ -33,6 +37,18 @@ from button import SettingPopup
 from game_class import GameInit
 from client.networking import Networking
 from screens.abc_screen import Screen
+
+with open("setting_text.txt", "r") as file:
+    for line in file:
+        key, value = line.strip().split(":")
+        if key == "computer_number":
+            computer_number = value.strip()
+        elif key == "user_name":
+            user_name = value.strip()
+
+print("computer_number : ", computer_number)
+print("user_name : ", user_name)
+
 
 class MainScreen(Screen):
     def __init__(self, surface: Surface, manager: pygame_gui.UIManager, networking: Networking):
@@ -176,6 +192,15 @@ class MainScreen(Screen):
                 for select_swap_button in self.select_swap_button_list:
                     select_swap_button.handle_event(event, self.game_init, self.screen)
 
+
+        #업적 로드
+        #load_achievements()
+
+        #업적 달성시
+        ''' if
+            update_achievement("업적이름")
+            save_achievements()
+        ''' 
 
         # 게임 실행
         if self.game_init.isPaused == False :

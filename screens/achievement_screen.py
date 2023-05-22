@@ -12,9 +12,6 @@ from game_logic import load_achievements
 from game_class import *
 
 
-from setting_class import *
-
-ess = Setting()
 ob = GameInit()
 
 #업적 로드
