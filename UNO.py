@@ -20,12 +20,10 @@ from screens.setting_screen import SettingScreen
 from screens.keysetting_screen import KeyScreen
 from screens.map_screen import MapScreen
 from screens.client_lobby import ClientLobby
-<<<<<<< Updated upstream
-=======
 from tmp_game_screen import GameScreen
 from network_client import Client
 from network_server import Server
->>>>>>> Stashed changes
+from screens.achievement_screen import Achievement
 
 from utilities.image_utility import load_image
 from utilities.text_utility import truncate
@@ -64,10 +62,13 @@ if os.path.isfile(volume_file):
     with open(volume_file, 'r') as f:
         volume_data = json.load(f)
 
+bgm_volume = (volume_data["slider1_value"] *
+              volume_data["slider2_value"] / 100.0)
+
 # 배경음악 생성
 pygame.mixer.init()
-pygame.mixer.music.load("assets/musics/TakeOnMe.mp3")
-pygame.mixer.music.set_volume(volume_data["slider2_value"])
+pygame.mixer.music.load("assets/musics/SellBuyMusic - 뒤뚱뒤뚱.mp3")
+pygame.mixer.music.set_volume(bgm_volume)
 pygame.mixer.music.play()
 
 # UI manager 생성
@@ -91,11 +92,7 @@ def main():
     fps = 120
     clock = pygame.time.Clock()
 
-<<<<<<< Updated upstream
-    current_screen = MainScreen(screen, manager, networking)
-=======
-    current_screen = VolumeScreen(screen, manager, networking)
->>>>>>> Stashed changes
+    current_screen = Achievement(screen, manager, networking)
 
     # 인증 부분
     '''
