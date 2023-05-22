@@ -92,6 +92,8 @@ class CardLoad:
         self.origin_pos = [x_pos, y_pos]
         self.target_pos = [x_pos, y_pos]
         self.position = self.target_pos     # 현재 좌표 설정 
+        
+        self.image_rect.x, self.image_rect.y = self.position
 
 
     # 이미지 애니메이션

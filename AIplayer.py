@@ -90,16 +90,19 @@ def ai_special_card(ob, cards):
         if ob.currentCard[1] == "Swap":
 
             swapedPlayer= randint(0, ob.numPlayers-1)
-            
-            ob.alertType = "swap"       # 스왑 팝업창 띄우기
-
             ob.playerList[ob.playerTurn], ob.playerList[swapedPlayer] = ob.playerList[swapedPlayer], ob.playerList[ob.playerTurn]
 
-            # 카드 리스트 초기화
-            ob.my_card_list = []
-            for i in range(len(ob.playerList[ob.playerTurn])) :
-                ob.my_card_list.append(CardLoad(ob.playerList[ob.playerTurn][i]))
-                ob.my_card_list[i].swap_card_pop_image(ob.my_card_list)
+            # 알림창 띄우기
+            if swapedPlayer == ob.playerTurn :
+                ob.alerType = "not_swap"
+            else :
+                ob.alertType = "swap"
+
+            if swapedPlayer == ob.myTurn :      # 스왑한 플레이어가 나면 카드 이미지 갱신
+                ob.my_card_list = []
+                for i in range(len(ob.playerList[ob.myTurn])) :
+                    ob.my_card_list.append(CardLoad(ob.playerList[ob.myTurn][i]))
+                    ob.my_card_list[i].swap_card_pop_image(ob.my_card_list)
 
             ai_color_change(ob)
             ob.playerTurn += ob.playDirection
