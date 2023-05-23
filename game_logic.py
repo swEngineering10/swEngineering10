@@ -48,8 +48,8 @@ def random_turn(ob):    # 턴 랜덤 지정
 def create(ob):
     ob.unopenDeck = []  # unopenDeck: 오픈 안한 모든 카드 집합
     colours = ["Red", "Yellow", "Blue", "Green"]
-    values = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
-              "Skip", "Reverse", "Draw2", "All_In"]
+    values = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, "Skip", "Reverse", "All_In"]
+    # values = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, "Skip", "Reverse", "Draw2", "All_In"]
     # values = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', "Skip", "Reverse", "Draw_Two", "All_In"]
     Wild = ["Color_Change", "Draw4", "Swap"]
 
@@ -421,6 +421,8 @@ def color_change(ob):
 
 # 순서를 정하는 함수
 def set_turn(ob):
+    if (ob.playerTurn+1) != ob.myTurn :
+        ob.isUnChecked0 = True
     over_turn(ob)
     # 완료되었을 때 남은 카드의 개수 저장
     for i in range(1, ob.numPlayers):
