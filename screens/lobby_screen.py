@@ -161,9 +161,10 @@ class LobbyScreen(Screen):
                 with open("setting_text.txt", "w") as file:
                     file.write(f"computer_number:{self.computer_number}\n")
                     file.write(f"user_name:{self.user_name}\n")
-<<<<<<< HEAD
                 self.next_screen = MainScreen
                 self.is_running = False
+<<<<<<< HEAD
+=======
 =======
                 # self.next_screen = MainScreen
                 # self.is_running = False
@@ -172,6 +173,7 @@ class LobbyScreen(Screen):
                 self.next_screen = CharacterScreen
                 self.is_running = False
 >>>>>>> Stashed changes
+>>>>>>> b5cdf55720cc49b66354c249e77ebe5cd8de28f2
 
 
 

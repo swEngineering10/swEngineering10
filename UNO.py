@@ -96,6 +96,9 @@ def main():
     fps = 120
     clock = pygame.time.Clock()
 
+<<<<<<< HEAD
+    current_screen = MainScreen(screen, manager, networking)
+=======
 <<<<<<< Updated upstream
 <<<<<<< HEAD
     current_screen = LobbyScreen(screen, manager, networking)
@@ -105,6 +108,7 @@ def main():
 =======
     current_screen = StartScreen(screen, manager, networking)
 >>>>>>> Stashed changes
+>>>>>>> b5cdf55720cc49b66354c249e77ebe5cd8de28f2
 
     # 인증 부분
     '''

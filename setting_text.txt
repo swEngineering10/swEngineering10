@@ -1,7 +1,2 @@
-<<<<<<< HEAD
-computer_number:2
+computer_number:4
 user_name:asdf
-=======
-computer_number:5
-user_name:fdfadfd
->>>>>>> 746afcb58dafea8cf1b4937e5666e55adb1cd098
