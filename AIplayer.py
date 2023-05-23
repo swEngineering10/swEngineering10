@@ -14,7 +14,7 @@ def ai_play_game(ob, cards):
 
         if (len(ob.available) == 0) and (ob.currentCard != ("Wild", "Draw4")):        # 낼 수 있는 카드가 없고 draw4 아닐 때 받기
             add_deck(ob, cards)
-    
+
         # 카드 내기
         elif (len(ob.available) != 0) or (ob.currentCard == ("Wild", "Draw4")):       # 낼 수 있는 카드가 있거나 draw4이면 내기
             if ob.smartAi == True:      #지역A의 똑똑한 AI라면?
@@ -30,12 +30,26 @@ def ai_play_game(ob, cards):
                         return
                 stupid_ai(ob, cards)        #skip 카드가 없었다면 평범하게 실행
             else:       #A지역이 아니라면
-                stupid_ai(ob, cards) # 여기에서 currentCard 바뀜!!!!!!!!!!!!!!!!!!!!!!!!
+                stupid_ai(ob, cards)
 
             if ob.currentCard[1] == "Skip" :
                 ob.alertType = "skip"
             elif ob.currentCard[1] == "Reverse" :
                 ob.alertType = "direction_change"
+
+
+            if ob.isUnChecked0 :
+                # 완료되었을 때 남은 currentCard 이미지 변경
+                if (ob.currentCard[1] == "Color_Change") or (ob.currentCard[1] == "Swap") or (ob.currentCard[1] == "Draw4") :
+                    ob.open_deck_image_list.append(CardLoad(("Wild", ob.currentCard[1])))
+                else :
+                    ob.open_deck_image_list.append(CardLoad(ob.currentCard))
+                ob.current_card_image = ob.open_deck_image_list[-1]
+
+                # 컴퓨터 플레이어가 카드 낼 때 애니메이션
+                ob.current_card_image.set_current_pos([ob.player_deck_image_list[ob.playerTurn-2].player_pos[0], ob.player_deck_image_list[ob.playerTurn-2].player_pos[1]])
+
+                ob.isUnChecked0 = False
 
 
     elif ob.Draw2Attack == True:    #Draw2 공격 상태라면
@@ -62,22 +76,18 @@ def ai_play_game(ob, cards):
 
             set_turn(ob)
 
+            if ob.isUnChecked0 :
+                # 완료되었을 때 남은 currentCard 이미지 변경
+                if (ob.currentCard[1] == "Color_Change") or (ob.currentCard[1] == "Swap") or (ob.currentCard[1] == "Draw4") :
+                    ob.open_deck_image_list.append(CardLoad(("Wild", ob.currentCard[1])))
+                else :
+                    ob.open_deck_image_list.append(CardLoad(ob.currentCard))
+                ob.current_card_image = ob.open_deck_image_list[-1]
 
-    if ob.isUnChecked0 :
-        # 완료되었을 때 남은 currentCard 이미지 변경
-        if (ob.currentCard[1] == "Color_Change") or (ob.currentCard[1] == "Swap") or (ob.currentCard[1] == "Draw4") :
-            ob.open_deck_image_list.append(CardLoad(("Wild", ob.currentCard[1])))
-        else :
-            ob.open_deck_image_list.append(CardLoad(ob.currentCard))
+                # 컴퓨터 플레이어가 카드 낼 때 애니메이션
+                ob.current_card_image.set_current_pos([ob.player_deck_image_list[ob.playerTurn-2].player_pos[0], ob.player_deck_image_list[ob.playerTurn-2].player_pos[1]])
 
-        ob.current_card_image = ob.open_deck_image_list[-1]
-        # 컴퓨터 플레이어가 카드 낼 때 애니메이션
-        if ob.currentCard == ("Wild", "Draw4") :
-            ob.current_card_image.set_current_pos([ob.player_deck_image_list[ob.playerTurn-1].player_pos[0], ob.player_deck_image_list[ob.playerTurn-1].player_pos[1]])
-        else :
-            ob.current_card_image.set_current_pos([ob.player_deck_image_list[ob.playerTurn-1].player_pos[0], ob.player_deck_image_list[ob.playerTurn-1].player_pos[1]])
-
-        ob.isUnChecked0 = False
+                ob.isUnChecked0 = False
 
     ob.isAIPlayed = True
 
@@ -190,6 +200,7 @@ def ai_color_change(ob):
     ob.currentPopup = None
     ob.IsChallenge = None
     ob.isUnChecked = True
+    ob.isUnChecked0 = True
 
 
 def stupid_ai(ob, cards):

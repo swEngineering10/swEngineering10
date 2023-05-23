@@ -26,6 +26,8 @@ class CardLoad:
         self.origin_pos = self.deck_pos
         self.target_pos = self.current_card_pos
 
+        self.click_sound = pygame.mixer.Sound("assets/musics/Mario Jumping Sound.mp3")
+
         self.set_back_pos()
 
 
@@ -284,6 +286,7 @@ def handle_click_card(event, game_init, surface):
 
         # 카드를 받는 경우
         if game_init.card_back_image.image_rect.collidepoint(mouse_pos):
+            game_init.card_back_image.click_sound.play()    # 효과음
             # unopendeck의 카드 객체 생성 후 my_card_list에 추가
             game_init.my_card_list.append(CardLoad(game_init.unopenDeck[-1]))
             game_init.my_card_list[len(game_init.my_card_list)-1].card_pop_image(game_init.my_card_list)    # 좌표 설정
@@ -298,6 +301,7 @@ def handle_click_card(event, game_init, surface):
                     print(str(game_init.my_card_list[i].card_value) + "카드 클릭")
                     for j in range(len(game_init.available)) :
                         if game_init.my_card_list[i].card_value == game_init.available[j] : # 낼 수 있는 카드일 경우
+                            game_init.my_card_list[i].click_sound.play()    # 효과음
                             game_init.my_card_list[i].play_card_event()
                             game_init.PlayedCard = j + 1
                             game_init.isCardPlayed = True

@@ -8,6 +8,7 @@ from pygame.event import Event
 from utility import resolution
 from client.networking import Networking
 from screens.abc_screen import Screen
+from screens.main_screen import MainScreen
 
 
 class LobbyScreen(Screen):
@@ -129,7 +130,7 @@ class LobbyScreen(Screen):
                     
             self.update_add_player_buttons()
             self.selected_number()
-                
+
             if event.ui_element == self.start_button:
                 if self.username_entry.get_text() == "" :
                     pass
@@ -139,8 +140,13 @@ class LobbyScreen(Screen):
                 with open("setting_text.txt", "w") as file:
                     file.write(f"computer_number:{self.computer_number}\n")
                     file.write(f"user_name:{self.user_name}\n")
+<<<<<<< HEAD
+                self.next_screen = MainScreen
+                self.is_running = False
+=======
                 # self.next_screen = MainScreen
                 # self.is_running = False
+>>>>>>> 746afcb58dafea8cf1b4937e5666e55adb1cd098
 
 
 

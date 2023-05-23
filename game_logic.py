@@ -217,36 +217,37 @@ def play_game(ob, cards):
 
 # 중복 카드 검사
 def is_repeatedcard(ob, cards):
-    ob.available = []
+    pass
+    # ob.available = []
 
-    if str(ob.currentCard[1]).isnumeric() == True:
-        for card in cards:
-            # 현재 카드와 덱에 숫자, 모양 똑같은 카드가 있다면
-            if (card[0] == ob.currentCard[0] and card[1] == ob.currentCard[1]):
-                ob.available.append(card)
-    else:
-        return 0
+    # if str(ob.currentCard[1]).isnumeric() == True:
+    #     for card in cards:
+    #         # 현재 카드와 덱에 숫자, 모양 똑같은 카드가 있다면
+    #         if (card[0] == ob.currentCard[0] and card[1] == ob.currentCard[1]):
+    #             ob.available.append(card)
+    # else:
+    #     return 0
 
-    while (1):
-        if len(ob.available) != 0:
-            print("추가로 낼 수 있는 카드", ob.available)
+    # while (1):
+    #     if len(ob.available) != 0:
+    #         print("추가로 낼 수 있는 카드", ob.available)
 
-            if ob.myTurn == ob.playerTurn:
-                a = int(input("중복 카드가 있습니다! 내시겠습니까? (0: 그만 내기, 1: 첫번째 카드, 2: ...)"))
-            else:
-                a = len(ob.available)
+    #         if ob.myTurn == ob.playerTurn:
+    #             a = int(input("중복 카드가 있습니다! 내시겠습니까? (0: 그만 내기, 1: 첫번째 카드, 2: ...)"))
+    #         else:
+    #             a = len(ob.available)
 
-            if a == 0:
-                break
-            else:
-                print(a, "번째 카드인 ", ob.available[a-1], "를 냅니다")
-                ob.openDeck.append(ob.available[a-1])      # 오픈 덱에 낼 카드 저장
-                ob.currentCard = pop(ob.openDeck)        # 오픈 덱의 첫번째 카드 저장
-                # 플레이어 카드덱에서 낸 카드는 삭제하기
-                ob.available.remove(ob.currentCard)
-                cards.remove(ob.currentCard)            # 플레이어 카드덱에서 낸 카드는 삭제하기
-        else:
-            break
+    #         if a == 0:
+    #             break
+    #         else:
+    #             print(a, "번째 카드인 ", ob.available[a-1], "를 냅니다")
+    #             ob.openDeck.append(ob.available[a-1])      # 오픈 덱에 낼 카드 저장
+    #             ob.currentCard = pop(ob.openDeck)        # 오픈 덱의 첫번째 카드 저장
+    #             # 플레이어 카드덱에서 낸 카드는 삭제하기
+    #             ob.available.remove(ob.currentCard)
+    #             cards.remove(ob.currentCard)            # 플레이어 카드덱에서 낸 카드는 삭제하기
+    #     else:
+    #         break
 
 
 # 인간 플레이어가 특수카드를 냈을 때 처리
@@ -423,8 +424,7 @@ def set_turn(ob):
     over_turn(ob)
     # 완료되었을 때 남은 카드의 개수 저장
     for i in range(1, ob.numPlayers):
-        ob.player_deck_image_list[i -
-                                  1].player_card_num = len(ob.playerList[i])
+        ob.player_deck_image_list[i - 1].player_card_num = len(ob.playerList[i])
 
     try:
         if ob.currentCard[1] == "Reverse":
@@ -438,7 +438,6 @@ def set_turn(ob):
         elif ob.currentCard[1] == "Skip":
             print("다다음 턴으로 넘어갑니다!")
             ob.playerTurn += ob.playDirection * 2
-            
             over_turn(ob)         
         elif (ob.currentCard[1] != "Color_Change") & (ob.currentCard[1] != "Swap") & (ob.currentCard[1] != "All_In") & (ob.currentCard[1] != "Draw4") :
             ob.playerTurn += ob.playDirection
