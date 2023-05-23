@@ -1,0 +1,26 @@
+[
+    {
+        "icon": "assets/images/single.png",
+        "name": "Single",
+        "achieved": "False",
+        "date_achieved": "--"
+    },
+    {
+        "icon": "assets/images/10.png",
+        "name": "Stage 4",
+        "achieved": "False",
+        "date_achieved": "--"
+    },
+    {
+        "icon": "assets/images/tech.png",
+        "name": "Stage 4",
+        "achieved": "False",
+        "date_achieved": "--"
+    },
+    {
+        "icon": "assets/images/uno.png",
+        "name": "Stage 4",
+        "achieved": "False",
+        "date_achieved": "--"
+    }
+]

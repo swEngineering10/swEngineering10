@@ -10,25 +10,12 @@ from pygame_gui.elements.ui_button import UIButton
 from utility import resolution
 from client.networking import Networking
 from screens.abc_screen import Screen
-<<<<<<< Updated upstream
-# from game_logic import load_achievements
-from game_class import *
-
-
-ob = GameInit()
-
-#업적 로드
-# load_achievements(ob)
-
-
-class Achievement(Screen):
-=======
 from game_class import *
 from setting_class import *
+from screens.start_screen import StartScreen
 
 
-class AchieveScreen(Screen):
->>>>>>> Stashed changes
+class AchieveScreen2(Screen):
     def __init__(self, surface: Surface, manager: pygame_gui.UIManager, networking: Networking):
         super().__init__(surface, manager, networking)
 
@@ -50,22 +37,22 @@ class AchieveScreen(Screen):
         self.button_rect = pygame.Rect((self.screen_width // 2 * 1.5, self. screen_height //
                                        2 * 0.6), (self.screen_width // 5, self.screen_height // 15))
         self.achieve1_button = UIButton(
-            relative_rect=self.button_rect, text='Stage1', manager=manager)
+            relative_rect=self.button_rect, text='Single Play', manager=manager)
 
         self.button_rect2 = pygame.Rect((self.screen_width // 2 * 1.5, self. screen_height //
                                          2 * 0.9), (self.screen_width // 5, self.screen_height // 15))
         self.achieve2_button = UIButton(
-            relative_rect=self.button_rect2, text='Stage2', manager=manager)
+            relative_rect=self.button_rect2, text='10 Turn', manager=manager)
 
         self.button_rect3 = pygame.Rect((self.screen_width // 2 * 1.5, self. screen_height //
                                          2 * 1.2), (self.screen_width // 5, self.screen_height // 15))
         self.achieve3_button = UIButton(
-            relative_rect=self.button_rect3, text='Stage3', manager=manager)
+            relative_rect=self.button_rect3, text='No Tech', manager=manager)
 
         self.button_rect4 = pygame.Rect((self.screen_width // 2 * 1.5, self. screen_height //
                                          2 * 1.5), (self.screen_width // 5, self.screen_height // 15))
         self.achieve4_button = UIButton(
-            relative_rect=self.button_rect4, text='Stage4', manager=manager)
+            relative_rect=self.button_rect4, text='UNO', manager=manager)
 
         self.button_rect5 = pygame.Rect(
             (self.screen_width // 2 * 0.8, self.screen_height // 2 * 1.7), (self.screen_width // 5, self.screen_height // 15))
@@ -85,8 +72,8 @@ class AchieveScreen(Screen):
         self.achievements = []  # 업적 정보를 저장할 리스트
 
     def load_achievements(self):
-        with open('achievements.json', 'r') as f:
-            self.achievements = json.load(f)
+        with open('achievements2.json', 'r') as f:
+            self.achievements2 = json.load(f)
 
     def draw_achievements(self):
         # 아이콘 크기 설정
@@ -94,7 +81,7 @@ class AchieveScreen(Screen):
         self.icon_height = 40
 
         self.offset_y = self.screen_height // 2 * 0.6
-        for achievement in self.achievements:
+        for achievement in self.achievements2:
             self.icon_path = achievement["icon"]
             self.name = achievement["name"]
             self.achieved = achievement["achieved"]
@@ -142,8 +129,8 @@ class AchieveScreen(Screen):
             rect=pygame.Rect(
                 (self.screen_width//2 * 0.5, self.screen_height//2 * 0.6), (450, 250)),
             manager=manager,
-            window_title='Stage 1',
-            action_long_desc='You clear the stage 1!',
+            window_title='Single',
+            action_long_desc='Winning a Single Player Battle!',
             action_short_name='OK',
             blocking=True)
         return popup_window
@@ -153,8 +140,8 @@ class AchieveScreen(Screen):
             rect=pygame.Rect(
                 (self.screen_width//2 * 0.5, self.screen_height//2 * 0.6), (450, 250)),
             manager=manager,
-            window_title='Stage 2',
-            action_long_desc='You clear the stage 2!',
+            window_title='10 Turn',
+            action_long_desc='Win in 10 turns in a single player game!',
             action_short_name='OK',
             blocking=True)
         return popup_window
@@ -164,8 +151,8 @@ class AchieveScreen(Screen):
             rect=pygame.Rect(
                 (self.screen_width//2 * 0.5, self.screen_height//2 * 0.6), (450, 250)),
             manager=manager,
-            window_title='Stage 3',
-            action_long_desc='You clear the stage 3!',
+            window_title='No Tech',
+            action_long_desc='Win without a single technical card!',
             action_short_name='OK',
             blocking=True)
         return popup_window
@@ -175,8 +162,8 @@ class AchieveScreen(Screen):
             rect=pygame.Rect(
                 (self.screen_width//2 * 0.5, self.screen_height//2 * 0.6), (450, 250)),
             manager=manager,
-            window_title='Stage 4',
-            action_long_desc='You clear the stage 4!',
+            window_title='UNO',
+            action_long_desc='Win after another player declares UNO!',
             action_short_name='OK',
             blocking=True)
         return popup_window
@@ -197,14 +184,11 @@ class AchieveScreen(Screen):
                 elif event.ui_element == self.achieve4_button:
                     self.popup_window = self.create_popup4(self.manager)
                 elif event.ui_element == self.home_button:
-                    from screens.start_screen import StartScreen
                     self.next_screen = StartScreen
                     self.is_running = False
                 elif event.ui_element == self.before_button:
-                    pass
-                elif event.ui_element == self.next_button:
-                    from screens.achievement_screen2 import AchieveScreen2
-                    self.next_screen = AchieveScreen2
+                    from screens.achievement_screen import AchieveScreen
+                    self.next_screen = AchieveScreen
                     self.is_running = False
 
     def run(self, events: list[Event]) -> bool:
