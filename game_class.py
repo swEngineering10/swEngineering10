@@ -70,8 +70,17 @@ class GameInit(object):
         self.achievements = []
         self.teckCount = 0
         
+        self.achievements = []  #업적 저장 변수
+        self.techCount = 0      #기술 카드가 몇번 사용되었는가? (업적)
+
+
         self.running = True
         
+        # 업적 부분
+
+
+
+
         
 '''class Player:
     def __init__(self, name):

@@ -470,8 +470,20 @@ def game_end(ob):
             for i in range(0, ob.numPlayers):
                 rank_game(ob, ob.playerList[i])
             print_rank(ob)
-            ob.running = False
 
+
+            # 업적 부분
+            if ob.winner == ob.mytrun:
+                update_achievement(ob, "single_victory")
+
+                if ob.turnCount <= 10:
+                    update_achievement(ob, "single_10_victory")
+            
+                if ob.techcount == 0:
+                    update_achievement(ob, "no_tech_victory")
+            save_achievements()
+
+            ob.running = False
 
 # 점수 계산을 해주는 함수
 def rank_game(ob, cards):
@@ -507,3 +519,40 @@ def info(ob):
     print("플레이어2 전체 카드", ob.playerList[2])
     print("플레이어3 전체 카드", ob.playerList[3])
     print("플레이어4 전체 카드", ob.playerList[4])
+    
+            
+           
+achievement_file = "achievements.txt"
+
+#업적 부분
+def load_achievements(ob):
+    try:
+        with open(achievement_file, "r") as file:
+            for line in file:
+                achievement, count = line.split(":")
+                ob.achievements.append({"name": achievement, "count": int(count)})
+        print("업적 정보 로드 완료")
+    except FileNotFoundError:
+        print("업적 정보 파일이 존재하지 않습니다. 새로운 파일을 생성합니다.")
+
+
+
+# 업적 정보 파일 저장
+def save_achievements():
+    with open(achievement_file, "w") as file:
+        for achievement in achievement_file:
+            file.write(f"{achievement['name']}:{achievement['count']}\n")
+        print("업적 정보 저장 완료")
+
+# 업적 파일 업데이트
+def update_achievement(ob, achievement_name):
+    for achievement in ob.achievements:
+        if achievement["name"] == achievement_name:
+            if achievement["count"] == 0:
+                achievement["count"] = 1
+                print(achievement_name,"업적 달성!")
+                break
+            if achievement["count"] != 0:
+                break
+            
+

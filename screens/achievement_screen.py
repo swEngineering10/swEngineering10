@@ -12,9 +12,6 @@ from screens.abc_screen import Screen
 from game_class import *
 
 
-from setting_class import *
-
-ess = Setting()
 ob = GameInit()
 
 #업적 로드
