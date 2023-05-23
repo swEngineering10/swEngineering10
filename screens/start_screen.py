@@ -14,6 +14,7 @@ from screens.setting_screen import SettingScreen
 from screens.mode_screen import ModeScreen
 from network_server import Server
 from screens.role_screen import RoleScreen
+from screens.achievement_screen import AchieveScreen
 
 
 class StartScreen(Screen):
@@ -76,10 +77,13 @@ class StartScreen(Screen):
             self.screen_width // 2 - self.button_width // 2, self.button_start_y + self.button_height + self.button_margin, self.button_width, self.button_height), text='MULTIPLAYER', manager=manager)
         self.button3 = pygame_gui.elements.UIButton(relative_rect=pygame.Rect(
             self.screen_width // 2 - self.button_width // 2, self.button_start_y + (self.button_height + self.button_margin) * 2, self.button_width, self.button_height), text='SETTINGS', manager=manager)
+        self.button5 = pygame_gui.elements.UIButton(relative_rect=pygame.Rect(
+            self.screen_width // 2 - self.button_width // 2, self.button_start_y + (self.button_height + self.button_margin) * 4, self.button_width, self.button_height), text='EXIT', manager=manager)
         self.button4 = pygame_gui.elements.UIButton(relative_rect=pygame.Rect(
-            self.screen_width // 2 - self.button_width // 2, self.button_start_y + (self.button_height + self.button_margin) * 3, self.button_width, self.button_height), text='EXIT', manager=manager)
+            self.screen_width // 2 - self.button_width // 2, self.button_start_y + (self.button_height + self.button_margin) * 3, self.button_width, self.button_height), text='Achievement', manager=manager)
 
-        buttons = [self.button1, self.button2, self.button3, self.button4]
+        buttons = [self.button1, self.button2,
+                   self.button3, self.button4, self.button5]
 
         self.buttons = buttons
         self.selected_button_index = 0
@@ -95,6 +99,10 @@ class StartScreen(Screen):
 
     def setting_mode_function(self):
         self.next_screen = SettingScreen
+        self.is_running = False
+
+    def achievement_mode_function(self):
+        self.next_screen = AchieveScreen
         self.is_running = False
 
     def exit_mode_function(self):
@@ -129,6 +137,8 @@ class StartScreen(Screen):
                     self.multiplayer_mode_function()
                 elif clicked_button == self.button3:
                     self.setting_mode_function()
+                elif clicked_button == self.button4:
+                    self.achievement_mode_function()
                 else:
                     self.exit_mode_function()
         if event.type == pygame_gui.UI_BUTTON_PRESSED:
@@ -140,6 +150,8 @@ class StartScreen(Screen):
                         self.multiplayer_mode_function()
                     elif button == self.button3:
                         self.setting_mode_function()
+                    elif clicked_button == self.button4:
+                        self.achievement_mode_function()
                     else:
                         self.exit_mode_function()
 

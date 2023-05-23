@@ -5,6 +5,7 @@ import json
 from pygame.event import Event
 from pygame.surface import Surface
 from pygame_gui.elements import UITextEntryLine, UIButton
+from datetime import date
 
 from utility import resolution
 from client.networking import Networking
@@ -511,6 +512,32 @@ class MapScreen(Screen):
             self.screen.blit(self.text3, self.text_rect3)
         if self.show_text4:
             self.screen.blit(self.text4, self.text_rect4)
+
+        with open('win_state.json', 'r') as f:
+            win_data = json.load(f)
+
+        with open('achievements.json', 'r') as f:
+            achievement_data = json.load(f)
+
+        if win_data["0"]:
+            achievement_data[0]["achieved"] = "True"
+            achievement_data[0]["date_achieved"] = date.today().strftime(
+                "%Y-%m-%d")
+        elif win_data["1"]:
+            achievement_data[1]["achieved"] = "True"
+            achievement_data[1]["date_achieved"] = date.today().strftime(
+                "%Y-%m-%d")
+        elif win_data["2"]:
+            achievement_data[2]["achieved"] = "True"
+            achievement_data[2]["date_achieved"] = date.today().strftime(
+                "%Y-%m-%d")
+        elif win_data["3"]:
+            achievement_data[3]["achieved"] = "True"
+            achievement_data[3]["date_achieved"] = date.today().strftime(
+                "%Y-%m-%d")
+
+        with open('achievements.json', 'w') as f:
+            json.dump(achievement_data, f, indent=4)
 
         for event in events:
             self.handle_event(event)

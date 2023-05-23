@@ -5,7 +5,8 @@ import pygame
 
 class GameInit(object):
     def __init__(self):
-        self.playerList = [[], [], [], [], [], []]          # 모든 플레이어의 보유 카드 정보 (최대 6명)
+        # 모든 플레이어의 보유 카드 정보 (최대 6명)
+        self.playerList = [[], [], [], [], [], []]
         self.unopenDeck = list()                                # 카드 더미
         self.openDeck = list()                                  # 오픈된 카드 더미
         self.currentCard = tuple()                              # openDeck의 가장 위 카드
@@ -20,6 +21,7 @@ class GameInit(object):
         self.is_ani_complete = False
         self.player_deck_image_list = []         # 플레이어 이미지 객체 리스트
 
+<<<<<<< Updated upstream
         self.numPlayers = 0     # 플레이어의 수
         self.playerName = ""    # 유저 이름
         self.playerTurn = 0     # 현재 턴은 몇번째 턴?
@@ -28,6 +30,14 @@ class GameInit(object):
         self.doubleWild = 0     # Wild가 중복으로 나오는 경우 방지 이전 색깔 저장 변수
         self.isUNO = False      # 우노 플래그
         
+=======
+        self.numPlayers = 0  # 플레이어의 수
+        self.playerTurn = 0  # 현재 턴은 몇번째 턴?
+        self.myTurn = 0  # 내턴은 몇번째인지 저장
+        self.nextTurn = 0  # 다음턴은 몇번째 플레이어인가?
+        self.doubleWild = 0  # Wild가 중복으로 나오는 경우 방지 이전 색깔 저장 변수
+
+>>>>>>> Stashed changes
         self.playDirection = 1          # 게임 진행 방향
         self.currentPlayerIndex = -1    # 현재 턴인 플레이어의 인덱스
 
@@ -60,8 +70,9 @@ class GameInit(object):
         self.Draw2Attack = False        # Draw2 공격이 진행중인가?
         self.Draw2Count = 0             # Draw2 공격이 몇번 중첩되었는가?
         self.turnCount = 1              # 게임이 시작된 이래로 몇번씩 주고받았는가?
-        
+
         self.isGameEnd = False  # 게임이 끝났는가?
+<<<<<<< Updated upstream
         self.winner = 0         #승리자 저장 변수
         self.score = []         #점수 저장 변수
         
@@ -82,6 +93,19 @@ class GameInit(object):
 
 
         
+=======
+        self.winner = 0  # 승리자 저장 변수
+        self.score = []  # 점수 저장 변수
+
+        self.smartAi = False  # 지역A의 똑똑한 AI인가?
+
+        self.achievements = []  # 업적 저장 변수
+        self.techCount = 0  # 기술 카드가 몇번 사용되었는가? (업적)
+
+        self.running = True
+
+
+>>>>>>> Stashed changes
 '''class Player:
     def __init__(self, name):
         self.deck = []
