@@ -1,8 +1,0 @@
-single_victory : 0
-story_A_victory : 0
-story_B_victory : 0
-story_C_victory : 0
-story_D_victory : 0
-single_10_victory : 0
-no_tech_victory : 0
-other_player_UNO_victory : 0

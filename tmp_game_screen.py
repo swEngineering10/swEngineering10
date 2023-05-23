@@ -6,6 +6,7 @@ import json
 from pygame.surface import Surface
 from pygame.event import Event
 from pygame_gui.elements.ui_button import UIButton
+from pygame_gui.elements.ui_label import UILabel
 
 from utility import resolution
 from client.networking import Networking
@@ -27,6 +28,10 @@ class GameScreen(Screen):
         # 딕셔너리 생성
         self.data = {"resolution": {
             "width": self.screen_width, "height": self.screen_height}}
+
+        label_rect = pygame.Rect((0, 240), (800, 30))
+        self.label = UILabel(relative_rect=label_rect,
+                             text="COMBO: allows you to play two or more cards at once by properly combining skill cards!", manager=manager)
 
         self.button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect(
             (350, 275), (100, 50)), text='Win', manager=manager)
