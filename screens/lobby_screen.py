@@ -8,8 +8,12 @@ from pygame.event import Event
 from utility import resolution
 from client.networking import Networking
 from screens.abc_screen import Screen
+<<<<<<< Updated upstream
 from screens.main_screen import MainScreen
 
+=======
+from screens.character_screen import CharacterScreen
+>>>>>>> Stashed changes
 
 class LobbyScreen(Screen):
     def __init__(self, surface: Surface, manager: pygame_gui.UIManager, networking: Networking):
@@ -21,7 +25,7 @@ class LobbyScreen(Screen):
         self.background = pygame.Surface(WINDOW_SIZE)
         self.screen = pygame.display.set_mode((WINDOW_SIZE))
         self.screen_width, self.screen_height = WINDOW_SIZE
-        # self.next_screen = MainScreen
+        self.next_screen = CharacterScreen
 
         # 다음 화면으로 전달해야 할 변수
         self.computer_number = 1
@@ -97,6 +101,16 @@ class LobbyScreen(Screen):
 
         self.button_index = 0
 
+    def save_player_info_to_json(self):
+        player_info = {
+            "computer_number": self.computer_number,
+            "user_name": self.user_name
+        }
+
+        with open('player_info.json', 'w') as outfile:
+            json.dump(player_info, outfile)
+
+
     # 버튼 상태 업데이트 함수
     def update_add_player_buttons(self):
         for i, button in enumerate(self.add_player_buttons):
@@ -130,13 +144,20 @@ class LobbyScreen(Screen):
                     
             self.update_add_player_buttons()
             self.selected_number()
+<<<<<<< Updated upstream
 
+=======
+            self.save_player_info_to_json
+                
+>>>>>>> Stashed changes
             if event.ui_element == self.start_button:
                 if self.username_entry.get_text() == "" :
                     pass
                 else :
                     self.user_name = self.username_entry.get_text()
+                    self.save_player_info_to_json()
                 print(self.user_name)
+<<<<<<< Updated upstream
                 with open("setting_text.txt", "w") as file:
                     file.write(f"computer_number:{self.computer_number}\n")
                     file.write(f"user_name:{self.user_name}\n")
@@ -147,6 +168,10 @@ class LobbyScreen(Screen):
                 # self.next_screen = MainScreen
                 # self.is_running = False
 >>>>>>> 746afcb58dafea8cf1b4937e5666e55adb1cd098
+=======
+                self.next_screen = CharacterScreen
+                self.is_running = False
+>>>>>>> Stashed changes
 
 
 

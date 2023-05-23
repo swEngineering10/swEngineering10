@@ -1,0 +1,26 @@
+[
+    {
+        "icon": "assets/images/tree.png",
+        "name": "Stage 1",
+        "achieved": "False",
+        "date_achieved": "--"
+    },
+    {
+        "icon": "assets/images/star.png",
+        "name": "Stage 2",
+        "achieved": "False",
+        "date_achieved": "--"
+    },
+    {
+        "icon": "assets/images/fire.png",
+        "name": "Stage 3",
+        "achieved": "False",
+        "date_achieved": "--"
+    },
+    {
+        "icon": "assets/images/water.png",
+        "name": "Stage 4",
+        "achieved": "False",
+        "date_achieved": "--"
+    }
+]
