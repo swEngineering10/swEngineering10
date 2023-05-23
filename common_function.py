@@ -21,6 +21,7 @@ def ai_color_change(ob):
     ob.currentPopup = None
     ob.IsChallenge = None
     ob.isUnChecked = True
+    ob.isUnChecked0 = True
 
 
 #다음 playerTurn턴 정할 때 숫자가 넘치지 않나 검사하는 함수

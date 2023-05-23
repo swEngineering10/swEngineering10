@@ -8,7 +8,7 @@ from pygame.event import Event
 from utility import resolution
 from client.networking import Networking
 from screens.abc_screen import Screen
-from game_logic import load_achievements
+# from game_logic import load_achievements
 from game_class import *
 
 
@@ -18,7 +18,7 @@ ess = Setting()
 ob = GameInit()
 
 #업적 로드
-load_achievements(ob)
+# load_achievements(ob)
 
 
 class Achievement(Screen):
