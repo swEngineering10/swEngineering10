@@ -172,9 +172,9 @@ class PopupTextButton():
     def on_click(self, game_init):
         # 챌린지 팝업 버튼
         if self.text == "챌린지" :
-            game_init.IsChallenge = 0
-        elif self.text == "포기" :
             game_init.IsChallenge = 1
+        elif self.text == "포기" :
+            game_init.IsChallenge = 0
 
         # 스왑 팝업 버튼
         elif self.text == "스왑" :
@@ -477,3 +477,98 @@ class InfoPopup():
         pygame.draw.rect(surface, WHITE, (self.x, self.y, self.width, self.height))
         pygame.draw.rect(surface, BLACK, (self.x, self.y, self.width, self.height), 2)
         surface.blit(self.text_surface, self.text_rect)
+
+
+
+# 우노 버튼
+class UNOButton():
+    def __init__(self):
+        self.background = BackGround()
+        self.image = pygame.image.load("assets/images/cards/UNO_Button.png")
+        self.image_rect = self.image.get_rect()
+        self.image_width = self.image_rect.width
+        self.image_height = self.image_rect.height
+        self.background_width = self.background.x_pos
+        self.background_height = self.background.y_pos
+        self.x = self.background.x_pos - self.image_width - 10
+        self.y = self.background.y_pos - self.image_height
+        self.image_rect.x = self.x
+        self.image_rect.y = self.y
+
+        self.hovered_image = pygame.image.load("assets/images/cards/UNO_Button_active.png")
+        self.hovered_image_width = self.hovered_image.get_rect().width
+        self.hovered_image_height = self.hovered_image.get_rect().height        
+        self.new_x = self.x - (self.hovered_image_width - self.image_width) // 2
+        self.new_y = self.y - (self.hovered_image_height - self.image_height) // 2
+        self.blit_image = self.image
+
+
+    def handle_event(self, event, game_init, surface):
+        if event.type == pygame.MOUSEBUTTONUP:
+            mouse_pos = pygame.mouse.get_pos()
+            if self.image_rect.collidepoint(mouse_pos):
+                self.on_click(game_init)
+
+        elif event.type == pygame.MOUSEMOTION:
+            mouse_pos = pygame.mouse.get_pos()
+            if self.image_rect.collidepoint(mouse_pos):
+                self.on_hover(surface)
+            else:
+                self.on_hover_exit(surface)
+
+    def on_hover(self, surface):
+        self.image_rect = pygame.Rect(self.new_x, self.new_y, self.hovered_image_width, self.hovered_image_height)
+        self.blit_image = self.hovered_image
+        self.draw(surface)
+
+    def on_hover_exit(self, surface):
+        self.blit_image = self.image
+        self.image_rect = pygame.Rect(self.x, self.y, self.image_width, self.image_height)
+        self.draw(surface)
+    
+    def on_click(self, game_init):
+        game_init.isUNO = True
+
+    def draw(self, surface):
+        surface.blit(self.blit_image, self.image_rect)
+
+
+# 플레이어 이름 로드 텍스트 박스
+class PlayerName():
+    def __init__(self, text):
+
+        # 텍스트
+        self.text = text
+        self.font_path = "assets/fonts/NanumSquare_acB.ttf"
+        self.font = pygame.font.Font(self.font_path, 20)
+        self.text_surface = self.font.render(self.text, True, (0, 0, 0))
+        self.text_length = self.text_surface.get_width()
+
+        self.box_width = self.text_length + 40
+        self.box_height = 40
+
+        self.background = BackGround()
+        self.background_height = self.background.y_pos - 40
+
+        self.rect_x = 10
+        self.rect_y = self.background_height - 10
+        self.name_box = pygame.Rect(self.rect_x, self.rect_y, self.box_width, self.box_height)
+
+
+    def draw(self, surface, game_init):
+        self.turn_calc(game_init)
+
+        pygame.draw.rect(surface, WHITE, (self.rect_x, self.rect_y, self.box_width, self.box_height))
+        pygame.draw.rect(surface, BLACK, (self.rect_x, self.rect_y, self.box_width, self.box_height), 2)
+        surface.blit(self.text_surface, (self.rect_x + 20, self.rect_y + 8))
+        surface.blit(self.turn_text_surface, (self.turn_text_x + 20, self.rect_y + 8))
+
+    def turn_calc(self, game_init) :
+        if game_init.playerTurn == 0 :
+            self.turn_text = f"{self.text}의 차례입니다."
+            self.turn_text_surface = self.font.render(self.turn_text, True, (0, 0, 0))
+            self.turn_text_x = self.box_width + self.rect_x
+        else :
+            self.turn_text = f"컴퓨터 {game_init.playerTurn}의 차례입니다."
+            self.turn_text_surface = self.font.render(self.turn_text, True, (0, 0, 0))
+            self.turn_text_x = self.box_width + self.rect_x

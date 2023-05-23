@@ -193,12 +193,9 @@ def play_game(ob, cards):
                 for i in range(0, ob.Draw2Count*2+1):
                     shuffle_card(ob)
                     popCard = ob.unopenDeck.pop()
-                    ob.playerList[ob.playerTurn].append(
-                        popCard)    # 카드 리스트에 저장
-                    ob.my_card_list.append(
-                        CardLoad(popCard))       # 카드 이이미지 리스트에 저장
-                print("방어 실패! ", ob.playerTurn, "번째 플레이어가",
-                      ob.Draw2Count * 2, "장을 먹습니다")
+                    ob.playerList[ob.playerTurn].append(popCard)    # 카드 리스트에 저장
+                    ob.my_card_list.append(CardLoad(popCard))       # 카드 이미지 리스트에 저장
+                print("방어 실패! ",ob.playerTurn,"번째 플레이어가", ob.Draw2Count * 2,"장을 먹습니다")
 
                 set_turn(ob)
                 ob.Draw2Attack = False
@@ -220,36 +217,37 @@ def play_game(ob, cards):
 
 # 중복 카드 검사
 def is_repeatedcard(ob, cards):
-    ob.available = []
+    pass
+    # ob.available = []
 
-    if str(ob.currentCard[1]).isnumeric() == True:
-        for card in cards:
-            # 현재 카드와 덱에 숫자, 모양 똑같은 카드가 있다면
-            if (card[0] == ob.currentCard[0] and card[1] == ob.currentCard[1]):
-                ob.available.append(card)
-    else:
-        return 0
+    # if str(ob.currentCard[1]).isnumeric() == True:
+    #     for card in cards:
+    #         # 현재 카드와 덱에 숫자, 모양 똑같은 카드가 있다면
+    #         if (card[0] == ob.currentCard[0] and card[1] == ob.currentCard[1]):
+    #             ob.available.append(card)
+    # else:
+    #     return 0
 
-    while (1):
-        if len(ob.available) != 0:
-            print("추가로 낼 수 있는 카드", ob.available)
+    # while (1):
+    #     if len(ob.available) != 0:
+    #         print("추가로 낼 수 있는 카드", ob.available)
 
-            if ob.myTurn == ob.playerTurn:
-                a = int(input("중복 카드가 있습니다! 내시겠습니까? (0: 그만 내기, 1: 첫번째 카드, 2: ...)"))
-            else:
-                a = len(ob.available)
+    #         if ob.myTurn == ob.playerTurn:
+    #             a = int(input("중복 카드가 있습니다! 내시겠습니까? (0: 그만 내기, 1: 첫번째 카드, 2: ...)"))
+    #         else:
+    #             a = len(ob.available)
 
-            if a == 0:
-                break
-            else:
-                print(a, "번째 카드인 ", ob.available[a-1], "를 냅니다")
-                ob.openDeck.append(ob.available[a-1])      # 오픈 덱에 낼 카드 저장
-                ob.currentCard = pop(ob.openDeck)        # 오픈 덱의 첫번째 카드 저장
-                # 플레이어 카드덱에서 낸 카드는 삭제하기
-                ob.available.remove(ob.currentCard)
-                cards.remove(ob.currentCard)            # 플레이어 카드덱에서 낸 카드는 삭제하기
-        else:
-            break
+    #         if a == 0:
+    #             break
+    #         else:
+    #             print(a, "번째 카드인 ", ob.available[a-1], "를 냅니다")
+    #             ob.openDeck.append(ob.available[a-1])      # 오픈 덱에 낼 카드 저장
+    #             ob.currentCard = pop(ob.openDeck)        # 오픈 덱의 첫번째 카드 저장
+    #             # 플레이어 카드덱에서 낸 카드는 삭제하기
+    #             ob.available.remove(ob.currentCard)
+    #             cards.remove(ob.currentCard)            # 플레이어 카드덱에서 낸 카드는 삭제하기
+    #     else:
+    #         break
 
 
 # 인간 플레이어가 특수카드를 냈을 때 처리
@@ -269,8 +267,7 @@ def special_card(ob, cards):
                         swapedPlayer = ob.swapNumber
 
                         # 아래는 한번만 실행 (아닐 경우 루프 돌면서 계속 서로 스왑)
-                        if ob.isUnChecked2:
-                            ob.A += 1
+                        if ob.isUnChecked2 :
                             # 스왑
                             ob.playerList[ob.playerTurn], ob.playerList[swapedPlayer] = ob.playerList[swapedPlayer], ob.playerList[ob.playerTurn]
 
@@ -301,27 +298,25 @@ def special_card(ob, cards):
         if ob.currentCard[1] == "Draw4":
 
             # Draw4 공격 시 color_change 외 코드는 한 번만 실행
-            if ob.isUnChecked:
+            if ob.isUnChecked3 :
 
-                challenge = randint(0, 1)  # ai가 공격할 것인가?
-                next_turn(ob)  # 다음턴 사람은 누구인가?
-
-                if challenge == 1:  # 공격시
-
+                challenge = randint(0, 1)       #ai가 공격할 것인가?
+                next_turn(ob)   #다음턴 사람은 누구인가?
+                
+                if challenge==1:        #공격시
                     Draw4(ob, cards)
-
-                else:  # 도전 자체를 하지 않는다면?
-                    print("다음턴이 4장을 먹습니다!")
+                else:                   #도전 자체를 하지 않는다면?
+                    ob.alertType = "giveup_challenge"   # 팝업 띄우기
                     for i in range(0, 4):
                         shuffle_card(ob)
                         ob.playerList[ob.nextTurn].append(
                             ob.unopenDeck.pop())  # 다음턴이 4장 먹음
 
-                ob.isUnChecked = False
+                ob.isUnChecked3 = False
 
             color_change(ob)
-
-    if ob.currentCard[1] == "Draw2":  # 다음턴이 두장먹기
+               
+    if ob.currentCard[1] == "Draw2":        #다음턴이 두장먹기
         Draw2(ob, cards)
 
     if ob.currentCard[1] == "All_In":  # 같은 색상 카드 다 내기
@@ -329,8 +324,7 @@ def special_card(ob, cards):
 
 
 def Draw4(ob, cards):
-    # print("다음턴인", ob.nextTurn,"이 도전합니다!")
-    is_challenge = 0  # is_challenge: 0이면 공격 실패
+    is_challenge = 0    #is_challenge: 0이면 공격 실패
     for i in cards:
         if i[0] == ob.doubleWild:
             is_challenge = 1
@@ -341,9 +335,9 @@ def Draw4(ob, cards):
             shuffle_card(ob)
             popCard = ob.unopenDeck.pop()
             ob.playerList[ob.playerTurn].append(popCard)    # 본인이 4장 먹음
-            if ob.plyerTurn == ob.myTurn:                  # 그 사람이 나면 이미지 추가
+            if ob.playerTurn == ob.myTurn :                  # 그 사람이 나면 이미지 추가
                 ob.my_card_list.append(CardLoad(popCard))
-                ob.my_card_list[i].card_pop_image(ob.my_card_list)
+                ob.my_card_list[len(ob.my_card_list) - 1].card_pop_image(ob.my_card_list)
 
     else:       # 공격 실패했다면
         ob.alertType = "fail_challenge"      # 공격 실패 알림창 띄우기
@@ -353,10 +347,10 @@ def Draw4(ob, cards):
             ob.playerList[ob.nextTurn].append(popCard)        # 다음턴이 6장 먹음
             if ob.nextTurn == ob.myTurn:                                 # 그 사람이 나면 이미지 추가
                 ob.my_card_list.append(CardLoad(popCard))
-                ob.my_card_list[i].card_pop_image(ob.my_card_list)
-
-
-# 다음턴이 두장먹기
+                ob.my_card_list[len(ob.my_card_list) - 1].card_pop_image(ob.my_card_list)
+        
+        
+#다음턴이 두장먹기
 def Draw2(ob, cards):
     next_turn(ob)
     ob.playerList[ob.nextTurn].append(ob.unopenDeck.pop())
@@ -400,9 +394,10 @@ def color_change(ob):
                 f"assets/images/cards/{ob.cardColor[newColour-1]}_Color_Change.png")
         elif ob.currentCard[1] == "Draw4":
             ob.currentCard = (ob.cardColor[newColour-1], "Draw4")
-            ob.current_card_image.image = pygame.image.load(
-                f"assets/images/cards/{ob.cardColor[newColour-1]}_Draw4.png")
-        elif ob.currentCard[1] == "Swap":
+            ob.current_card_image.image = pygame.image.load(f"assets/images/cards/{ob.cardColor[newColour-1]}_Draw4.png")
+            ob.playerTurn += ob.playDirection * 2
+            over_turn(ob)         
+        elif ob.currentCard[1] == "Swap" : 
             ob.currentCard = (ob.cardColor[newColour-1], "Swap")
             ob.current_card_image.image = pygame.image.load(
                 f"assets/images/cards/{ob.cardColor[newColour-1]}_Swap.png")
@@ -412,9 +407,11 @@ def color_change(ob):
 
         # 아래는 변수 원상복구
         ob.selectedColor = None
-        ob.isCardPlayed = False  # 카드 냄 (더이상 play_game 반복 X)
+        ob.isCardPlayed = False # 카드 냄 (더이상 play_game 반복 X)
+        ob.isUnChecked0 = True
         ob.isUnChecked = True
         ob.isUnChecked2 = True
+        ob.isUnChecked3 = True
         ob.IsSwap == None
         ob.isColorChanged = False
 
@@ -427,8 +424,7 @@ def set_turn(ob):
     over_turn(ob)
     # 완료되었을 때 남은 카드의 개수 저장
     for i in range(1, ob.numPlayers):
-        ob.player_deck_image_list[i -
-                                  1].player_card_num = len(ob.playerList[i])
+        ob.player_deck_image_list[i - 1].player_card_num = len(ob.playerList[i])
 
     try:
         if ob.currentCard[1] == "Reverse":
@@ -439,13 +435,11 @@ def set_turn(ob):
         elif len(ob.openDeck) == 0:
             ob.playerTurn += ob.playDirection
             over_turn(ob)
-        elif ob.currentCard[1] == "Skip" or ob.openDeck[1][-1] == "Draw4":
-            if ob.currentCard[1] == "Skip":
-                ob.alertType = "direction_change"
+        elif ob.currentCard[1] == "Skip":
             print("다다음 턴으로 넘어갑니다!")
             ob.playerTurn += ob.playDirection * 2
-            over_turn(ob)
-        elif (ob.currentCard[1] != "Color_Change") & (ob.currentCard[1] != "Swap") & (ob.currentCard[1] != "All_In"):
+            over_turn(ob)         
+        elif (ob.currentCard[1] != "Color_Change") & (ob.currentCard[1] != "Swap") & (ob.currentCard[1] != "All_In") & (ob.currentCard[1] != "Draw4") :
             ob.playerTurn += ob.playDirection
             over_turn(ob)
     except IndexError:
@@ -476,8 +470,20 @@ def game_end(ob):
             for i in range(0, ob.numPlayers):
                 rank_game(ob, ob.playerList[i])
             print_rank(ob)
-            ob.running = False
 
+
+            # 업적 부분
+            if ob.winner == ob.mytrun:
+                update_achievement(ob, "single_victory")
+
+                if ob.turnCount <= 10:
+                    update_achievement(ob, "single_10_victory")
+            
+                if ob.techcount == 0:
+                    update_achievement(ob, "no_tech_victory")
+            save_achievements()
+
+            ob.running = False
 
 # 점수 계산을 해주는 함수
 def rank_game(ob, cards):
@@ -513,3 +519,40 @@ def info(ob):
     print("플레이어2 전체 카드", ob.playerList[2])
     print("플레이어3 전체 카드", ob.playerList[3])
     print("플레이어4 전체 카드", ob.playerList[4])
+    
+            
+           
+achievement_file = "achievements.txt"
+
+#업적 부분
+def load_achievements(ob):
+    try:
+        with open(achievement_file, "r") as file:
+            for line in file:
+                achievement, count = line.split(":")
+                ob.achievements.append({"name": achievement, "count": int(count)})
+        print("업적 정보 로드 완료")
+    except FileNotFoundError:
+        print("업적 정보 파일이 존재하지 않습니다. 새로운 파일을 생성합니다.")
+
+
+
+# 업적 정보 파일 저장
+def save_achievements():
+    with open(achievement_file, "w") as file:
+        for achievement in achievement_file:
+            file.write(f"{achievement['name']}:{achievement['count']}\n")
+        print("업적 정보 저장 완료")
+
+# 업적 파일 업데이트
+def update_achievement(ob, achievement_name):
+    for achievement in ob.achievements:
+        if achievement["name"] == achievement_name:
+            if achievement["count"] == 0:
+                achievement["count"] = 1
+                print(achievement_name,"업적 달성!")
+                break
+            if achievement["count"] != 0:
+                break
+            
+

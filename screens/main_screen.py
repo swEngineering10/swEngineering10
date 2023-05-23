@@ -14,6 +14,10 @@ from game_logic import init
 from game_logic import split_cards
 from game_logic import play_game
 from game_logic import game_end
+from game_logic import load_achievements
+from game_logic import save_achievements
+from game_logic import update_achievement
+
 from AIplayer import ai_play_game
 from utility import resolution
 from utility import handle_click_card
@@ -29,10 +33,13 @@ from button import SelectSwapPopup
 from button import InfoPopup
 from button import SettingButton
 from button import SettingPopup
+from button import UNOButton
+from button import PlayerName
 
 from game_class import GameInit
 from client.networking import Networking
 from screens.abc_screen import Screen
+
 
 class MainScreen(Screen):
     def __init__(self, surface: Surface, manager: pygame_gui.UIManager, networking: Networking):
@@ -47,10 +54,23 @@ class MainScreen(Screen):
 
         # 배경화면 객체 생성
         self.background = BackGround()
+
+        # 유저 이름, 컴퓨터 수 불러오기
+        with open("setting_text.txt", "r") as file:
+            for line in file:
+                key, value = line.strip().split(":")
+                if key == "computer_number":
+                    computer_number = value.strip()
+                elif key == "user_name":
+                    user_name = value.strip()
+
+        print("computer_number : ", computer_number)
+        print("user_name : ", user_name)
         
         # 게임 객체 생성
         self.game_init = GameInit()
-        self.game_init.numPlayers = 5  # 유저 포함 플레이어의 수 가정 (나중에 로비에서 값 받아야 함!!)
+        self.game_init.numPlayers = int(computer_number) + 1  # 유저 포함 플레이어의 수
+        self.game_init.playerName = user_name        # 유저 이름
 
         # 카드 덱 (미오픈) 이미지 로드
         self.game_init.card_back_image = CardLoad(("card", "back"))
@@ -62,11 +82,15 @@ class MainScreen(Screen):
         self.game_init.open_deck_image_list.append(CardLoad(self.game_init.currentCard))
         self.game_init.current_card_image = self.game_init.open_deck_image_list[0]
         
+        
         # 유저 보유 카드 리스트 모두 CardLoad 객체 생성 후 이미지 로드
         split_cards(self.game_init)
         for i in range(len(self.game_init.playerList[self.game_init.myTurn])) :
             self.game_init.my_card_list.append(CardLoad(self.game_init.playerList[self.game_init.myTurn][i]))
             self.game_init.my_card_list[i].card_pop_image(self.game_init.my_card_list)
+
+        # 디버깅용
+        # self.game_init.playerList[1] = [("Wild", "Draw4")]
 
         # computer player 이미지 객체 생성 (1 ~ numPlayers-1)
         for i in range(1, self.game_init.numPlayers) :
@@ -77,6 +101,12 @@ class MainScreen(Screen):
         self.setting_popup = SettingPopup()
         self.setting_popup_button_list = [self.setting_popup.setting_button, self.setting_popup.start_button, self.setting_popup.continue_button, self.setting_popup.exit_button]
         
+        # 우노 버튼
+        self.uno_button = UNOButton()
+
+        # 플레이어 이름
+        self.player_name = PlayerName(self.game_init.playerName)
+
 
         # 아래는 모두 팝업 관련 객체 생성 #
 
@@ -102,6 +132,7 @@ class MainScreen(Screen):
         self.fail_challenge = InfoPopup("도전에 실패했습니다! 다음 플레이어가 6장을 받습니다.")
         self.success_challenge = InfoPopup("도전에 성공했습니다! 현재 플레이어가 4장을 받습니다.")
         self.giveup_challenge = InfoPopup("도전을 포기합니다. 다음 플레이어가 4장을 받습니다.")
+
 
 
     
@@ -141,6 +172,10 @@ class MainScreen(Screen):
 
         # 설정 버튼 로드
         self.setting_button.draw(self.screen)
+        # 우노 버튼 로드
+        self.uno_button.draw(self.screen)
+        # 플레이어 이름 로드
+        self.player_name.draw(self.screen, self.game_init)
 
 
         for event in events:
@@ -153,6 +188,8 @@ class MainScreen(Screen):
             if self.game_init.isPaused :
                 for setting_popup_button in self.setting_popup_button_list:
                     setting_popup_button.handle_event(event, self.game_init, self.screen)
+
+            self.uno_button.handle_event(event, self.game_init, self.surface)
 
             # 아래는 팝업 이벤트
             if self.game_init.currentPopup == "color_change":
@@ -172,9 +209,19 @@ class MainScreen(Screen):
                     select_swap_button.handle_event(event, self.game_init, self.screen)
 
 
+        #업적 로드
+        #load_achievements()
+
+        #업적 달성시
+        ''' if
+            update_achievement("업적이름")
+            save_achievements()
+        ''' 
+
         # 게임 실행
         if self.game_init.isPaused == False :
             if self.game_init.myTurn == self.game_init.playerTurn :
+                # self.game_init.isAIPlayed = False
                 if self.game_init.delay == 200 :
                     play_game(self.game_init, self.game_init.playerList[self.game_init.playerTurn])
                     self.game_init.delay = 0
@@ -190,16 +237,22 @@ class MainScreen(Screen):
 
             # currentCard의 색깔 바꾸기
             if self.game_init.currentCard[1] == "Color_Change" :
-                print("색깔 변경")
                 self.game_init.current_card_image.image = pygame.image.load(f"assets/images/cards/{self.game_init.currentCard[0]}_Color_Change.png")
+                if self.game_init.alertType != None :
+                    self.game_init.alertDelay = 0
                 self.game_init.alertType = "color_change"   # 알림창 띄우기
 
             elif self.game_init.currentCard[1] == "Draw4" :
-                self.game_init.current_card_image.image = pygame.image.load(f"assets/images/cards/{self.game_init.currentCard[0]}_Draw4.png")
-                self.game_init.alertType = "color_change"   # 알림창 띄우기
+                if self.game_init.currentCard[0] != "Wild" :    # 색깔 선택했을 때만!
+                    self.game_init.current_card_image.image = pygame.image.load(f"assets/images/cards/{self.game_init.currentCard[0]}_Draw4.png")
+                    if self.game_init.alertType != None :
+                        self.game_init.alertDelay = 0
+                    self.game_init.alertType = "color_change"   # 알림창 띄우기
 
             elif self.game_init.currentCard[1] == "Swap" : 
                 self.game_init.current_card_image.image = pygame.image.load(f"assets/images/cards/{self.game_init.currentCard[0]}_Swap.png")
+                if self.game_init.alertType != None :
+                    self.game_init.alertDelay = 0
                 self.game_init.alertType = "color_change"   # 알림창 띄우기
 
             self.game_init.isAIPlayed = False

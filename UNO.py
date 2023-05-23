@@ -92,7 +92,11 @@ def main():
     fps = 120
     clock = pygame.time.Clock()
 
-    current_screen = Achievement(screen, manager, networking)
+<<<<<<< HEAD
+    current_screen = LobbyScreen(screen, manager, networking)
+=======
+    current_screen = MainScreen(screen, manager, networking)
+>>>>>>> 746afcb58dafea8cf1b4937e5666e55adb1cd098
 
     # 인증 부분
     '''
